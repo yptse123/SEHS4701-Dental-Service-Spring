@@ -1,10 +1,10 @@
 -- Sample users (password is 'password' hashed with BCrypt)
 INSERT INTO `dental`.`users` (`username`, `password`, `email`, `role`) VALUES
-('admin', '$2a$10$xn3LI/AjqicFYZFruSwve.681477XaVNaUQbr1gioaWPn4t1KsnmG', 'admin@hkdc.com', 'ADMIN'),
-('patient1', '$2a$10$xn3LI/AjqicFYZFruSwve.681477XaVNaUQbr1gioaWPn4t1KsnmG', 'patient1@example.com', 'PATIENT'),
-('patient2', '$2a$10$xn3LI/AjqicFYZFruSwve.681477XaVNaUQbr1gioaWPn4t1KsnmG', 'patient2@example.com', 'PATIENT'),
-('drlam', '$2a$10$xn3LI/AjqicFYZFruSwve.681477XaVNaUQbr1gioaWPn4t1KsnmG', 'william.lam@hkdc.com', 'DENTIST'),
-('drchen', '$2a$10$xn3LI/AjqicFYZFruSwve.681477XaVNaUQbr1gioaWPn4t1KsnmG', 'sarah.chen@hkdc.com', 'DENTIST');
+('admin', '$2a$10$v06WAFp7ldRMTTVm59iDGeLqsIOAtFY.fD0IqPppEVSmTlW79b3P.', 'admin@hkdc.com', 'ADMIN'),
+('patient1', '$2a$10$v06WAFp7ldRMTTVm59iDGeLqsIOAtFY.fD0IqPppEVSmTlW79b3P.', 'patient1@example.com', 'PATIENT'),
+('patient2', '$2a$10$v06WAFp7ldRMTTVm59iDGeLqsIOAtFY.fD0IqPppEVSmTlW79b3P.', 'patient2@example.com', 'PATIENT'),
+('drlam', '$2a$10$v06WAFp7ldRMTTVm59iDGeLqsIOAtFY.fD0IqPppEVSmTlW79b3P.', 'william.lam@hkdc.com', 'DENTIST'),
+('drchen', '$2a$10$v06WAFp7ldRMTTVm59iDGeLqsIOAtFY.fD0IqPppEVSmTlW79b3P.', 'sarah.chen@hkdc.com', 'DENTIST');
 
 -- Sample patients
 INSERT INTO `dental`.`patients` (`user_id`, `first_name`, `last_name`, `phone`, `address`, `date_of_birth`, `gender`) VALUES
