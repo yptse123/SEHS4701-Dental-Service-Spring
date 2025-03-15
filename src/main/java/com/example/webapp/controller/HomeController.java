@@ -5,9 +5,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class HomeController {
-
+    
     @GetMapping("/")
-    public String index() {
-        return "index";
+    public String home() {
+        return "home"; // This will render home.jsp
+    }
+    
+    @GetMapping("/home")
+    public String homePage() {
+        return "home"; // This will also render home.jsp
     }
 }

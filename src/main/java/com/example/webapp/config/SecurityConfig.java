@@ -43,16 +43,17 @@ public class SecurityConfig {
                     .logoutUrl("/logout")
                     .logoutSuccessUrl("/login?logout=true")
                     .invalidateHttpSession(true)
-                    .deleteCookies("JSESSIONID")
+                    .clearAuthentication(true)
+                    .deleteCookies("JSESSIONID", "remember-me")  // Add all cookies you want to clear
                     .permitAll()
             )
             .rememberMe(remember -> 
                 remember
                     .key("uniqueAndSecretKey")
-                    .tokenValiditySeconds(86400) // 1 day
+                    .tokenValiditySeconds(86400)
                     .userDetailsService(userDetailsService)
             )
-            .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**")); // Enable CSRF with exceptions for API endpoints
+            .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"));
 
         return http.build();
     }

@@ -2,9 +2,11 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="_csrf" content="${_csrf.token}"/>
     <meta name="_csrf_header" content="${_csrf.headerName}"/>
-<head>
     <title>Login - HKDC</title>
     <link rel="stylesheet" href="<c:url value='/static/css/main.css'/>">
 </head>
@@ -46,11 +48,16 @@
             
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
             
+            <div class="remember-me">
+                <input type="checkbox" id="remember-me" name="remember-me">
+                <label for="remember-me">Remember me</label>
+            </div>
+            
             <div>
                 <button type="submit">Login</button>
             </div>
             
-            <div>
+            <div class="register-link">
                 <p>Don't have an account? <a href="<c:url value='/register'/>">Register now</a></p>
             </div>
         </form>
