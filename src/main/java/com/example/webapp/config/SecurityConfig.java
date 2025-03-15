@@ -52,7 +52,7 @@ public class SecurityConfig {
                     .tokenValiditySeconds(86400) // 1 day
                     .userDetailsService(userDetailsService)
             )
-            .csrf(csrf -> csrf.disable()); // Disable CSRF protection
+            .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**")); // Enable CSRF with exceptions for API endpoints
 
         return http.build();
     }
