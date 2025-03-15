@@ -139,13 +139,6 @@
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            // Initialize sidebar state
-            if (localStorage.getItem('sidebar-collapsed') === 'true') {
-                $('.dashboard-container').addClass('sidebar-collapsed');
-            }
-        });
-    </script>
+    <script src="<c:url value='/js/admin/clinic-form.js'/>"></script>
 </body>
 </html>

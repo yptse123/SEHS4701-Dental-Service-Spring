@@ -13,47 +13,50 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final UserDetailsService userDetailsService;
+        private final UserDetailsService userDetailsService;
 
-    public SecurityConfig(UserDetailsService userDetailsService) {
-        this.userDetailsService = userDetailsService;
-    }
+        public SecurityConfig(UserDetailsService userDetailsService) {
+                this.userDetailsService = userDetailsService;
+        }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/", "/home", "/register", "/login", "/static/**", "/css/**", "/js/**",
-                                "/testpage", "/test")
-                        .permitAll()
-                        .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers("/patient/**").hasAuthority("ROLE_PATIENT")
-                        .requestMatchers("/dentist/**").hasAuthority("ROLE_DENTIST")
-                        .requestMatchers("/WEB-INF/jsp/auth/**").permitAll()
-                        .anyRequest().authenticated())
-                .formLogin(login -> login
-                        .loginPage("/login")
-                        .defaultSuccessUrl("/dashboard")
-                        .failureUrl("/login?error=true")
-                        .permitAll())
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout=true")
-                        .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID", "remember-me")
-                        .clearAuthentication(true)
-                        .permitAll())
-                .rememberMe(remember -> remember
-                        .key("uniqueAndSecretKey")
-                        .tokenValiditySeconds(86400)
-                        .userDetailsService(userDetailsService))
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"));
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+                http
+                                .securityContext((securityContext) -> securityContext
+                                                .requireExplicitSave(false))
+                                .authorizeHttpRequests(authorizeRequests -> authorizeRequests
+                                                .requestMatchers("/", "/home", "/register", "/login", "/static/**",
+                                                                "/css/**", "/js/**",
+                                                                "/testpage", "/test")
+                                                .permitAll()
+                                                .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
+                                                .requestMatchers("/patient/**").hasAuthority("ROLE_PATIENT")
+                                                .requestMatchers("/dentist/**").hasAuthority("ROLE_DENTIST")
+                                                .requestMatchers("/WEB-INF/jsp/auth/**").permitAll()
+                                                .anyRequest().authenticated())
+                                .formLogin(login -> login
+                                                .loginPage("/login")
+                                                .defaultSuccessUrl("/dashboard")
+                                                .failureUrl("/login?error=true")
+                                                .permitAll())
+                                .logout(logout -> logout
+                                                .logoutUrl("/logout")
+                                                .logoutSuccessUrl("/login?logout=true")
+                                                .invalidateHttpSession(true)
+                                                .deleteCookies("JSESSIONID", "remember-me")
+                                                .clearAuthentication(true)
+                                                .permitAll())
+                                .rememberMe(remember -> remember
+                                                .key("uniqueAndSecretKey")
+                                                .tokenValiditySeconds(86400)
+                                                .userDetailsService(userDetailsService))
+                                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"));
 
-        return http.build();
-    }
+                return http.build();
+        }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
 }

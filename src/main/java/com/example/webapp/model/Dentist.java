@@ -37,13 +37,16 @@ public class Dentist {
 
     @Column(name = "bio")
     private String bio;
-    
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-    
+
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-    
+
+    @Column(name = "is_active", nullable = false)
+    private boolean active = true;
+
     @OneToMany(mappedBy = "dentist", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<DentistClinicAssignment> clinicAssignments = new HashSet<>();
 
@@ -125,6 +128,18 @@ public class Dentist {
         this.updatedAt = updatedAt;
     }
 
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public boolean getActive() {
+        return isActive();
+    }
+
     public Set<DentistClinicAssignment> getClinicAssignments() {
         return clinicAssignments;
     }
@@ -149,7 +164,7 @@ public class Dentist {
     public String getFullName() {
         return firstName + " " + lastName;
     }
-    
+
     // Method to get primary clinic
     public Clinic getPrimaryClinic() {
         return clinicAssignments.stream()
@@ -158,7 +173,7 @@ public class Dentist {
                 .findFirst()
                 .orElse(null);
     }
-    
+
     // Method to get all assigned clinics
     public Set<Clinic> getClinics() {
         Set<Clinic> clinics = new HashSet<>();

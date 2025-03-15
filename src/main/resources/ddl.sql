@@ -81,6 +81,7 @@ CREATE TABLE `dental`.`dentists` (
     `last_name` VARCHAR(50) NOT NULL,
     `specialization` VARCHAR(100),
     `bio` TEXT,
+    `is_active` BOOLEAN DEFAULT TRUE,
     PRIMARY KEY (`dentist_id`),
     CONSTRAINT `fk_dentist_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
 );

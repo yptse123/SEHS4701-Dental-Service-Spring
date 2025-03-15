@@ -20,9 +20,9 @@ INSERT INTO `dental`.`clinics` (`name`, `address`, `city`, `postal_code`, `phone
 ('HKDC Mong Kok Branch', 'Shop 404, 4/F, Langham Place, 8 Argyle Street', 'Mong Kok', 'KL', '27890123', 'mongkok@hkdc.com', '09:00', '18:00', TRUE, 'Modern clinic with the latest dental technology serving the Mong Kok community.');
 
 -- Sample dentists
-INSERT INTO `dental`.`dentists` (`user_id`, `first_name`, `last_name`, `specialization`, `bio`) VALUES
-(4, 'William', 'Lam', 'General Dentistry', 'Dr. William Lam has over 15 years of experience in general dentistry.'),
-(5, 'Sarah', 'Chen', 'Orthodontics', 'Dr. Sarah Chen is a specialist in orthodontics with 10 years of experience.');
+INSERT INTO `dental`.`dentists` (`user_id`, `first_name`, `last_name`, `specialization`, `bio`, `is_active`) VALUES
+(4, 'William', 'Lam', 'General Dentistry', 'Dr. William Lam has over 15 years of experience in general dentistry.', TRUE),
+(5, 'Sarah', 'Chen', 'Orthodontics', 'Dr. Sarah Chen is a specialist in orthodontics with 10 years of experience.', TRUE);
 
 -- Sample dentist clinic assignments
 INSERT INTO `dental`.`dentist_clinic_assignments` (`dentist_id`, `clinic_id`, `is_primary`) VALUES
