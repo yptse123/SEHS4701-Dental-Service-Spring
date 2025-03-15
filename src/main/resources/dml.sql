@@ -11,18 +11,26 @@ INSERT INTO `dental`.`patients` (`user_id`, `first_name`, `last_name`, `phone`, 
 (2, 'John', 'Doe', '98765432', '123 Main St, Hong Kong', '1985-05-15', 'MALE'),
 (3, 'Jane', 'Smith', '91234567', '456 Park Ave, Kowloon', '1990-10-20', 'FEMALE');
 
--- Sample clinics
-INSERT INTO `dental`.`clinics` (`name`, `address`, `phone`, `open_time`, `close_time`) VALUES
-('HKDC TST Branch', 'Shop 101, 1/F, Tsim Sha Tsui Centre, 66 Mody Road, TST', '23456789', '09:00:00', '18:00:00'),
-('HKDC Kwai Chung Branch', 'Shop 203, 2/F, Metroplaza, 223 Hing Fong Road, Kwai Chung', '24567890', '09:00:00', '18:00:00'),
-('HKDC Central Branch', 'Suite 505, 5/F, The Center, 99 Queen\'s Road Central, Central', '25678901', '09:00:00', '18:00:00'),
-('HKDC Causeway Bay Branch', 'Shop 303, 3/F, Times Square, 1 Matheson Street, Causeway Bay', '26789012', '09:00:00', '18:00:00'),
-('HKDC Mong Kok Branch', 'Shop 404, 4/F, Langham Place, 8 Argyle Street, Mong Kok', '27890123', '09:00:00', '18:00:00');
+-- Updated Sample clinics with new schema
+INSERT INTO `dental`.`clinics` (`name`, `address`, `city`, `postal_code`, `phone`, `email`, `opening_time`, `closing_time`, `is_active`, `description`) VALUES
+('HKDC TST Branch', 'Shop 101, 1/F, Tsim Sha Tsui Centre, 66 Mody Road', 'Tsim Sha Tsui', 'TST', '23456789', 'tst@hkdc.com', '09:00', '18:00', TRUE, 'Our flagship branch in the heart of Tsim Sha Tsui offering comprehensive dental services.'),
+('HKDC Kwai Chung Branch', 'Shop 203, 2/F, Metroplaza, 223 Hing Fong Road', 'Kwai Chung', 'NT', '24567890', 'kwaichung@hkdc.com', '09:00', '18:00', TRUE, 'Conveniently located in Metroplaza shopping center with modern equipment and facilities.'),
+('HKDC Central Branch', 'Suite 505, 5/F, The Center, 99 Queen\'s Road', 'Central', 'HK', '25678901', 'central@hkdc.com', '09:00', '18:00', TRUE, 'Premium dental clinic catering to professionals in the Central business district.'),
+('HKDC Causeway Bay Branch', 'Shop 303, 3/F, Times Square, 1 Matheson Street', 'Causeway Bay', 'HK', '26789012', 'cwb@hkdc.com', '09:00', '18:00', TRUE, 'Family-friendly dental clinic located in the heart of Causeway Bay shopping district.'),
+('HKDC Mong Kok Branch', 'Shop 404, 4/F, Langham Place, 8 Argyle Street', 'Mong Kok', 'KL', '27890123', 'mongkok@hkdc.com', '09:00', '18:00', TRUE, 'Modern clinic with the latest dental technology serving the Mong Kok community.');
 
 -- Sample dentists
 INSERT INTO `dental`.`dentists` (`user_id`, `first_name`, `last_name`, `specialization`, `bio`) VALUES
 (4, 'William', 'Lam', 'General Dentistry', 'Dr. William Lam has over 15 years of experience in general dentistry.'),
 (5, 'Sarah', 'Chen', 'Orthodontics', 'Dr. Sarah Chen is a specialist in orthodontics with 10 years of experience.');
+
+-- Sample dentist clinic assignments
+INSERT INTO `dental`.`dentist_clinic_assignments` (`dentist_id`, `clinic_id`, `is_primary`) VALUES
+(1, 1, TRUE),  -- Dr. Lam's primary clinic is TST Branch
+(1, 2, FALSE), -- Dr. Lam also works at Kwai Chung Branch
+(2, 3, TRUE),  -- Dr. Chen's primary clinic is Central Branch
+(2, 4, FALSE), -- Dr. Chen also works at Causeway Bay Branch
+(2, 5, FALSE); -- Dr. Chen also works at Mong Kok Branch
 
 -- Sample schedules
 INSERT INTO `dental`.`schedules` (`dentist_id`, `clinic_id`, `day_of_week`, `start_time`, `end_time`) VALUES

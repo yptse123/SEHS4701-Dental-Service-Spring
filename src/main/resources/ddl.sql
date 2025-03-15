@@ -57,13 +57,21 @@ CREATE TABLE `dental`.`patients` (
 );
 
 CREATE TABLE `dental`.`clinics` (
-    `clinic_id` BIGINT NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(100) NOT NULL,
-    `address` VARCHAR(255) NOT NULL,
-    `phone` VARCHAR(20) NOT NULL,
-    `open_time` TIME NOT NULL,
-    `close_time` TIME NOT NULL,
-    PRIMARY KEY (`clinic_id`)
+  `clinic_id` BIGINT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(100) NOT NULL,
+  `address` VARCHAR(500) NOT NULL,
+  `city` VARCHAR(50),
+  `postal_code` VARCHAR(20),
+  `phone` VARCHAR(20),
+  `email` VARCHAR(100),
+  `opening_time` VARCHAR(20),
+  `closing_time` VARCHAR(20),
+  `is_active` BOOLEAN DEFAULT TRUE,
+  `description` TEXT,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`clinic_id`),
+  UNIQUE KEY `uk_clinic_name` (`name`)
 );
 
 CREATE TABLE `dental`.`dentists` (
@@ -75,6 +83,19 @@ CREATE TABLE `dental`.`dentists` (
     `bio` TEXT,
     PRIMARY KEY (`dentist_id`),
     CONSTRAINT `fk_dentist_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
+);
+
+CREATE TABLE `dental`.`dentist_clinic_assignments` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `dentist_id` BIGINT NOT NULL,
+  `clinic_id` BIGINT NOT NULL,
+  `is_primary` BOOLEAN DEFAULT FALSE,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_dentist_clinic` (`dentist_id`, `clinic_id`),
+  CONSTRAINT `fk_assignment_dentist` FOREIGN KEY (`dentist_id`) REFERENCES `dentists` (`dentist_id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_assignment_clinic` FOREIGN KEY (`clinic_id`) REFERENCES `clinics` (`clinic_id`) ON DELETE CASCADE
 );
 
 CREATE TABLE `dental`.`schedules` (
