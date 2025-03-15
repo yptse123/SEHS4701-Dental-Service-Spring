@@ -22,38 +22,32 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .authorizeHttpRequests(authorizeRequests ->
-                authorizeRequests
-                    .requestMatchers("/", "/home", "/register", "/login", "/static/**", "/css/**", "/js/**", "/testpage", "/test").permitAll()
-                    .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
-                    .requestMatchers("/patient/**").hasAuthority("ROLE_PATIENT")
-                    .requestMatchers("/dentist/**").hasAuthority("ROLE_DENTIST")
-                    .requestMatchers("/WEB-INF/jsp/auth/**").permitAll()
-                    .anyRequest().authenticated()
-            )
-            .formLogin(login ->
-                login
-                    .loginPage("/login")
-                    .defaultSuccessUrl("/dashboard")
-                    .failureUrl("/login?error=true")
-                    .permitAll()
-            )
-            .logout(logout ->
-                logout
-                    .logoutUrl("/logout")
-                    .logoutSuccessUrl("/login?logout=true")
-                    .invalidateHttpSession(true)
-                    .clearAuthentication(true)
-                    .deleteCookies("JSESSIONID", "remember-me")  // Add all cookies you want to clear
-                    .permitAll()
-            )
-            .rememberMe(remember -> 
-                remember
-                    .key("uniqueAndSecretKey")
-                    .tokenValiditySeconds(86400)
-                    .userDetailsService(userDetailsService)
-            )
-            .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"));
+                .authorizeHttpRequests(authorizeRequests -> authorizeRequests
+                        .requestMatchers("/", "/home", "/register", "/login", "/static/**", "/css/**", "/js/**",
+                                "/testpage", "/test")
+                        .permitAll()
+                        .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers("/patient/**").hasAuthority("ROLE_PATIENT")
+                        .requestMatchers("/dentist/**").hasAuthority("ROLE_DENTIST")
+                        .requestMatchers("/WEB-INF/jsp/auth/**").permitAll()
+                        .anyRequest().authenticated())
+                .formLogin(login -> login
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/dashboard")
+                        .failureUrl("/login?error=true")
+                        .permitAll())
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout=true")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID", "remember-me")
+                        .clearAuthentication(true)
+                        .permitAll())
+                .rememberMe(remember -> remember
+                        .key("uniqueAndSecretKey")
+                        .tokenValiditySeconds(86400)
+                        .userDetailsService(userDetailsService))
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"));
 
         return http.build();
     }

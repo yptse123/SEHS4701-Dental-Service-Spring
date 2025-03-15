@@ -76,12 +76,13 @@
                                 </sec:authorize>
 
                                 <li>
-                                    <form id="logoutForm" action="<c:url value='/logout'/>" method="post"
-                                        style="display:none;">
+                                    <form id="logoutForm" action="<c:url value='/logout'/>" method="post">
                                         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                                     </form>
-                                <li><a href="<c:url value='/logout-page'/>"><i class="fas fa-sign-out-alt"></i>
-                                        Logout</a></li>
+                                    <a href="javascript:void(0)"
+                                        onclick="document.getElementById('logoutForm').submit();">
+                                        <i class="fas fa-sign-out-alt"></i> Logout
+                                    </a>
                                 </li>
                             </ul>
                         </nav>
