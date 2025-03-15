@@ -41,6 +41,67 @@ body {
     grid-template-columns: 70px 1fr;
 }
 
+/* Make sidebar header always visible in collapsed state */
+.dashboard-container.sidebar-collapsed .sidebar-header {
+    flex-direction: column;
+    align-items: center;
+    padding: 15px 0;
+    position: relative;
+}
+
+/* Hide the HKDC text in collapsed mode but keep logo */
+.dashboard-container.sidebar-collapsed .sidebar-header h2 span {
+    display: none;
+}
+
+/* Keep the toggle button visible */
+.dashboard-container.sidebar-collapsed .sidebar-toggle {
+    position: static;  /* Reset any absolute positioning */
+    margin-top: 10px;  /* Add space between tooth icon and hamburger */
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+/* Make the tooth icon more prominent in collapsed mode */
+.dashboard-container.sidebar-collapsed .sidebar-header h2 i {
+    font-size: 1.5rem;
+}
+
+/* Ensure text is hidden but icons stay visible */
+.dashboard-container.sidebar-collapsed .sidebar-nav a span {
+    display: none;
+}
+
+/* Center the icons in collapsed mode */
+.dashboard-container.sidebar-collapsed .sidebar-nav a {
+    justify-content: center;
+    padding: 12px 0;
+}
+
+/* Add tooltip styling for hover effect in collapsed mode */
+.sidebar-nav a {
+    position: relative;
+}
+
+.dashboard-container.sidebar-collapsed .sidebar-nav a:hover::after {
+    content: attr(data-title);
+    position: absolute;
+    left: 70px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #333;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 3px;
+    white-space: nowrap;
+    z-index: 99;
+}
+
 /* Sidebar */
 .sidebar {
     background-color: var(--background-white);
@@ -89,8 +150,10 @@ body {
     border-bottom: 1px solid var(--border-color);
 }
 
+/* Ensure proper alignment of other sidebar elements in collapsed state */
 .dashboard-container.sidebar-collapsed .sidebar-user {
     justify-content: center;
+    padding: 15px 0;
 }
 
 .avatar {
