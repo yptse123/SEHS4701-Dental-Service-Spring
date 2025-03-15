@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -12,14 +13,47 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private final UserDetailsService userDetailsService;
+
+    public SecurityConfig(UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(authorizeRequests ->
+        http
+            .authorizeHttpRequests(authorizeRequests ->
                 authorizeRequests
-                    .requestMatchers("/**").permitAll()  // Allow access to everything for debugging
+                    .requestMatchers("/", "/home", "/register", "/login", "/static/**", "/css/**", "/js/**", "/testpage", "/test").permitAll()
+                    .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
+                    .requestMatchers("/patient/**").hasAuthority("ROLE_PATIENT")
+                    .requestMatchers("/dentist/**").hasAuthority("ROLE_DENTIST")
+                    .requestMatchers("/WEB-INF/jsp/auth/**").permitAll()
+                    .anyRequest().authenticated()
             )
-            .csrf(csrf -> csrf.disable());  // Temporarily disable CSRF for easier testing
-        
+            .formLogin(login ->
+                login
+                    .loginPage("/login")
+                    .defaultSuccessUrl("/dashboard")
+                    .failureUrl("/login?error=true")
+                    .permitAll()
+            )
+            .logout(logout ->
+                logout
+                    .logoutUrl("/logout")
+                    .logoutSuccessUrl("/login?logout=true")
+                    .invalidateHttpSession(true)
+                    .deleteCookies("JSESSIONID")
+                    .permitAll()
+            )
+            .rememberMe(remember -> 
+                remember
+                    .key("uniqueAndSecretKey")
+                    .tokenValiditySeconds(86400) // 1 day
+                    .userDetailsService(userDetailsService)
+            )
+            .csrf(csrf -> csrf.disable()); // Disable CSRF protection
+
         return http.build();
     }
 
