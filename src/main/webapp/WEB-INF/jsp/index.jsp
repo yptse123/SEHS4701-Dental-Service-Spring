@@ -2,10 +2,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>Spring Boot JSP Example</title>
+    <title>Welcome to HKDC</title>
 </head>
 <body>
-    <h1>${message}</h1>
+    <h1>Hong Kong Dental Care</h1>
+    <p>Welcome to our dental booking system.</p>
+    <p><a href="/login">Login</a> | <a href="/register">Register</a></p>
 </body>
 </html>

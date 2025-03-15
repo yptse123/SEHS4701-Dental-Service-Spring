@@ -2,67 +2,48 @@ package com.example.webapp.service;
 
 import com.example.webapp.model.User;
 import com.example.webapp.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
-    public List<User> findAll() {
-        return userRepository.findAll();
-    }
-
-    @Override
-    public Optional<User> findById(Long id) {
-        return userRepository.findById(id);
-    }
-
-    @Override
-    public User save(User user) {
+    public User registerNewUser(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setCreatedAt(LocalDateTime.now());
+        user.setUpdatedAt(LocalDateTime.now());
         return userRepository.save(user);
     }
 
     @Override
-    public void deleteById(Long id) {
-        userRepository.deleteById(id);
+    public Optional<User> findByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
-    
+
     @Override
-    public List<User> getAllUsers() {
-        return findAll();
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
-    
+
     @Override
-    public User getUserById(Long id) {
-        return findById(id).orElse(null);
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
     }
-    
+
     @Override
-    public User createUser(User user) {
-        return save(user);
-    }
-    
-    @Override
-    public User updateUser(Long id, User user) {
-        if (findById(id).isPresent()) {
-            // Assuming User has a setId method
-            user.setId(id);
-            return save(user);
-        }
-        return null;
-    }
-    
-    @Override
-    public void deleteUser(Long id) {
-        deleteById(id);
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
     }
 }
