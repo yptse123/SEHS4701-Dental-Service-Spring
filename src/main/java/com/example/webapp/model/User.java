@@ -28,6 +28,9 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserPreferences preferences;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Profile profile;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -103,6 +106,20 @@ public class User {
         this.preferences = preferences;
         if (preferences != null) {
             preferences.setUser(this);
+        }
+    }
+
+    public Profile getProfile() {
+        if (profile == null) {
+            profile = new Profile(this);
+        }
+        return profile;
+    }
+
+    public void setProfile(Profile profile) {
+        this.profile = profile;
+        if (profile != null) {
+            profile.setUser(this);
         }
     }
 

@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
     public User save(User user) {
         // Update the timestamp
         user.setUpdatedAt(LocalDateTime.now());
-        
+
         // Save to repository
         return userRepository.save(user);
     }
@@ -54,5 +54,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
+    }
+
+    @Override
+    public Optional<User> findById(Long id) {
+        return userRepository.findById(id);
     }
 }

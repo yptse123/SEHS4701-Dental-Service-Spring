@@ -16,7 +16,15 @@
 
             <div class="user-dropdown">
                 <button class="user-dropdown-toggle" id="userDropdownToggle">
-                    <i class="fas fa-user-circle"></i>
+                    <c:choose>
+                        <c:when test="${not empty user.profile.profileImagePath}">
+                            <img src="<c:url value='/profile/image/${user.id}'/>" alt="Profile"
+                                class="user-avatar-small">
+                        </c:when>
+                        <c:otherwise>
+                            <i class="fas fa-user-circle"></i>
+                        </c:otherwise>
+                    </c:choose>
                     <span>${user.username}</span>
                     <i class="fas fa-chevron-down"></i>
                 </button>
@@ -25,7 +33,15 @@
                     <div class="dropdown-header">
                         <div class="user-info-large">
                             <div class="avatar-large">
-                                <i class="fas fa-user-circle"></i>
+                                <c:choose>
+                                    <c:when test="${not empty user.profile.profileImagePath}">
+                                        <img src="<c:url value='/profile/image/${user.id}'/>" alt="Profile"
+                                            class="avatar-image">
+                                    </c:when>
+                                    <c:otherwise>
+                                        <i class="fas fa-user-circle"></i>
+                                    </c:otherwise>
+                                </c:choose>
                             </div>
                             <div>
                                 <p class="name-large">${user.username}</p>

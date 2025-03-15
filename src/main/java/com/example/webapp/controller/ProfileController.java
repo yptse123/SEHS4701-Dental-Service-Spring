@@ -1,8 +1,12 @@
 package com.example.webapp.controller;
 
+import com.example.webapp.model.Profile;
 import com.example.webapp.model.User;
 import com.example.webapp.model.UserPreferences;
+import com.example.webapp.service.ProfileService;
 import com.example.webapp.service.UserService;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -10,21 +14,26 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
-
+import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 @Controller
 public class ProfileController {
 
     private final UserService userService;
+    private final ProfileService profileService;
     private final PasswordEncoder passwordEncoder;
 
-    public ProfileController(UserService userService, PasswordEncoder passwordEncoder) {
+    public ProfileController(UserService userService, ProfileService profileService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
+        this.profileService = profileService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -47,6 +56,138 @@ public class ProfileController {
         model.addAttribute("user", user);
         model.addAttribute("passwordUpdateDto", new PasswordUpdateDto());
         return "profile-settings";
+    }
+
+    @PostMapping("/profile/update-info")
+    public String updateProfileInfo(
+            @RequestParam("firstName") String firstName,
+            @RequestParam("lastName") String lastName,
+            @RequestParam("phoneNumber") String phoneNumber,
+            @RequestParam(value = "dateOfBirth", required = false) String dateOfBirth,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        User user = userService.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Profile profile = user.getProfile();
+
+        // Update basic info
+        profile.setFirstName(firstName);
+        profile.setLastName(lastName);
+        profile.setPhoneNumber(phoneNumber);
+
+        // Process date of birth
+        if (dateOfBirth != null && !dateOfBirth.isEmpty()) {
+            try {
+                LocalDate dob = LocalDate.parse(dateOfBirth);
+                profile.setDateOfBirth(dob);
+            } catch (Exception e) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Invalid date format for date of birth");
+                return "redirect:/profile";
+            }
+        }
+
+        profile.setUpdatedAt(LocalDateTime.now());
+        profileService.save(profile);
+
+        redirectAttributes.addFlashAttribute("successMessage", "Profile information updated successfully");
+        return "redirect:/profile";
+    }
+
+    @PostMapping("/profile/update-address")
+    public String updateAddress(
+            @RequestParam("address") String address,
+            @RequestParam("city") String city,
+            @RequestParam("postalCode") String postalCode,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        User user = userService.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Profile profile = user.getProfile();
+        profileService.updateAddress(profile, address, city, postalCode);
+
+        redirectAttributes.addFlashAttribute("successMessage", "Address updated successfully");
+        return "redirect:/profile";
+    }
+
+    @PostMapping("/profile/update-dob")
+    public String updateDateOfBirth(
+            @RequestParam("dateOfBirth") String dateOfBirth,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        User user = userService.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Profile profile = user.getProfile();
+        try {
+            LocalDate dob = LocalDate.parse(dateOfBirth, DateTimeFormatter.ISO_DATE);
+            profile.setDateOfBirth(dob);
+            profile.setUpdatedAt(LocalDateTime.now());
+            profileService.save(profile);
+
+            redirectAttributes.addFlashAttribute("successMessage", "Date of birth updated successfully");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Invalid date format");
+        }
+
+        return "redirect:/profile";
+    }
+
+    @PostMapping("/profile/upload-image")
+    public String uploadProfileImage(
+            @RequestParam("profileImage") MultipartFile profileImage,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        User user = userService.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Profile profile = user.getProfile();
+
+        try {
+            if (!profileImage.isEmpty()) {
+                profileService.uploadProfileImage(profile, profileImage);
+                redirectAttributes.addFlashAttribute("successMessage", "Profile image updated successfully");
+            } else {
+                redirectAttributes.addFlashAttribute("errorMessage", "Please select an image to upload");
+            }
+        } catch (IOException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to upload image: " + e.getMessage());
+        }
+
+        return "redirect:/profile";
+    }
+
+    @GetMapping("/profile/image/{userId}")
+    public ResponseEntity<byte[]> getProfileImage(@PathVariable Long userId) {
+        Optional<User> userOpt = userService.findById(userId);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            Profile profile = user.getProfile();
+
+            try {
+                byte[] imageData = profileService.getProfileImage(profile);
+                if (imageData != null) {
+                    return ResponseEntity
+                            .ok()
+                            .contentType(MediaType.IMAGE_JPEG)
+                            .body(imageData);
+                }
+            } catch (IOException e) {
+                // Log error
+            }
+        }
+
+        // Return default image or empty response
+        return ResponseEntity.notFound().build();
     }
 
     @PostMapping("/profile/update-email")

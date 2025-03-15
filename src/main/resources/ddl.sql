@@ -25,6 +25,24 @@ CREATE TABLE `dental`.`user_preferences` (
   CONSTRAINT `fk_preferences_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
 );
 
+CREATE TABLE `dental`.`user_profiles` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `user_id` BIGINT NOT NULL,
+  `first_name` VARCHAR(100),
+  `last_name` VARCHAR(100),
+  `phone_number` VARCHAR(20),
+  `address` VARCHAR(500),
+  `city` VARCHAR(100),
+  `postal_code` VARCHAR(20),
+  `date_of_birth` DATE,
+  `profile_image_path` VARCHAR(255),
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_user_profiles_user_id` (`user_id`),
+  CONSTRAINT `fk_profile_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
+);
+
 CREATE TABLE `dental`.`patients` (
     `patient_id` BIGINT NOT NULL AUTO_INCREMENT,
     `user_id` BIGINT NOT NULL,
