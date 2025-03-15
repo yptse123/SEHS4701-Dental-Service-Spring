@@ -6,7 +6,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.beans.factory.annotation.Autowired;
 import com.example.webapp.model.User;
 import com.example.webapp.service.UserService;
 
@@ -15,7 +14,6 @@ public class DashboardController {
     
     private final UserService userService;
     
-    @Autowired
     public DashboardController(UserService userService) {
         this.userService = userService;
     }
