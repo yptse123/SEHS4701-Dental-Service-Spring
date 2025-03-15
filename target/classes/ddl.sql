@@ -13,6 +13,18 @@ CREATE TABLE `dental`.`users` (
     PRIMARY KEY (`user_id`)
 );
 
+CREATE TABLE `dental`.`user_preferences` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `user_id` bigint NOT NULL,
+  `email_notifications` boolean DEFAULT true,
+  `sms_notifications` boolean DEFAULT false,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_user_preferences_user_id` (`user_id`),
+  CONSTRAINT `fk_preferences_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
+);
+
 CREATE TABLE `dental`.`patients` (
     `patient_id` BIGINT NOT NULL AUTO_INCREMENT,
     `user_id` BIGINT NOT NULL,

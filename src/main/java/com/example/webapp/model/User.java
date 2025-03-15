@@ -25,6 +25,9 @@ public class User {
     @Column(nullable = false)
     private Role role;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private UserPreferences preferences;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -87,6 +90,20 @@ public class User {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public UserPreferences getPreferences() {
+        if (preferences == null) {
+            preferences = new UserPreferences(this);
+        }
+        return preferences;
+    }
+
+    public void setPreferences(UserPreferences preferences) {
+        this.preferences = preferences;
+        if (preferences != null) {
+            preferences.setUser(this);
+        }
     }
 
     public LocalDateTime getCreatedAt() {
