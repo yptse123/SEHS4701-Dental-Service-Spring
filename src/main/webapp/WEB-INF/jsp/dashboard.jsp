@@ -359,8 +359,8 @@
 
                                         <div class="action-card">
                                             <i class="fas fa-calendar-alt"></i>
-                                            <h3>Manage Schedules</h3>
-                                            <a href="<c:url value='/admin/schedules'/>" class="btn-primary">View</a>
+                                            <h3>Manage Appointments</h3>
+                                            <a href="<c:url value='/admin/appointments'/>" class="btn-primary">View</a>
                                         </div>
 
                                         <div class="action-card">
