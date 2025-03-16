@@ -124,4 +124,8 @@ public interface AppointmentService {
         Appointment findLastCompletedByPatient(Patient patient);
 
         Appointment findNextScheduledByPatient(Patient patient);
+
+        List<Appointment> findByDentistBetweenDates(Dentist dentist, LocalDate startDate, LocalDate endDate);
+
+        List<Appointment> findByDentistBetweenDates(Dentist dentist, LocalDate startDate, LocalDate endDate, int limit);
 }

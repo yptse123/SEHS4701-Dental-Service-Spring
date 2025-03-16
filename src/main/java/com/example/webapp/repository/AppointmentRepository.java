@@ -4,6 +4,7 @@ import com.example.webapp.model.Appointment;
 import com.example.webapp.model.Dentist;
 import com.example.webapp.model.Patient;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -102,4 +103,10 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long>,
 
         List<Appointment> findByPatientAndStatusAndAppointmentDateGreaterThanEqual(
                         Patient patient, Appointment.Status status, LocalDate date, Pageable pageable);
+
+        List<Appointment> findByDentistAndAppointmentDateBetweenOrderByAppointmentDateAscStartTimeAsc(
+                        Dentist dentist, LocalDate startDate, LocalDate endDate);
+
+        Page<Appointment> findByDentistAndAppointmentDateBetween(
+                        Dentist dentist, LocalDate startDate, LocalDate endDate, Pageable pageable);
 }

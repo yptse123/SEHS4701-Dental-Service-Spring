@@ -342,4 +342,18 @@ public class AppointmentServiceImpl implements AppointmentService {
                 patient, Appointment.Status.SCHEDULED, LocalDate.now(), pageRequest);
         return scheduled.isEmpty() ? null : scheduled.get(0);
     }
+
+    @Override
+    public List<Appointment> findByDentistBetweenDates(Dentist dentist, LocalDate startDate, LocalDate endDate) {
+        return appointmentRepository.findByDentistAndAppointmentDateBetweenOrderByAppointmentDateAscStartTimeAsc(
+                dentist, startDate, endDate);
+    }
+
+    @Override
+    public List<Appointment> findByDentistBetweenDates(Dentist dentist, LocalDate startDate, LocalDate endDate,
+            int limit) {
+        PageRequest pageRequest = PageRequest.of(0, limit, Sort.by(Sort.Direction.ASC, "appointmentDate", "startTime"));
+        return appointmentRepository.findByDentistAndAppointmentDateBetween(dentist, startDate, endDate, pageRequest)
+                .getContent();
+    }
 }
