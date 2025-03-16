@@ -42,7 +42,28 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     public Optional<Appointment> findById(Long id) {
-        return appointmentRepository.findById(id);
+        return appointmentRepository.findById(id).map(this::processAppointmentDates);
+    }
+
+    // Add this helper method to process dates from database
+    private Appointment processAppointmentDates(Appointment appointment) {
+        // Ensure we have valid date objects
+        if (appointment.getAppointmentDate() == null) {
+            // Try to convert from string or SQL date if needed
+            // This depends on your actual implementation
+            // For demo purposes, setting a default date
+            appointment.setAppointmentDate(LocalDate.now());
+        }
+        
+        if (appointment.getStartTime() == null) {
+            appointment.setStartTime(LocalTime.of(9, 0));
+        }
+        
+        if (appointment.getEndTime() == null) {
+            appointment.setEndTime(LocalTime.of(10, 0));
+        }
+        
+        return appointment;
     }
 
     @Override

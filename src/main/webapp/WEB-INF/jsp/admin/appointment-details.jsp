@@ -71,15 +71,30 @@
                                 <div class="appointment-header">
                                     <div class="appointment-date">
                                         <div class="date-badge">
-                                            <!-- Use DateTimeUtils to format the date -->
-                                            <c:set var="formattedDate" value="${DateTimeUtils.formatLongDate(appointment.appointmentDate)}" />
-                                            ${formattedDate}
+                                            <!-- Add null check -->
+                                            <c:choose>
+                                                <c:when test="${appointment.appointmentDate != null}">
+                                                    <c:set var="formattedDate" value="${DateTimeUtils.formatLongDate(appointment.appointmentDate)}" />
+                                                    ${formattedDate}
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <span class="text-muted">Date not available</span>
+                                                </c:otherwise>
+                                            </c:choose>
                                         </div>
                                         <div class="time-badge">
                                             <i class="fas fa-clock"></i>
-                                            <c:set var="startTime" value="${DateTimeUtils.formatTime(appointment.startTime)}" />
-                                            <c:set var="endTime" value="${DateTimeUtils.formatTime(appointment.endTime)}" />
-                                            ${startTime} - ${endTime}
+                                            <!-- Add null checks -->
+                                            <c:choose>
+                                                <c:when test="${appointment.startTime != null && appointment.endTime != null}">
+                                                    <c:set var="startTime" value="${DateTimeUtils.formatTime(appointment.startTime)}" />
+                                                    <c:set var="endTime" value="${DateTimeUtils.formatTime(appointment.endTime)}" />
+                                                    ${startTime} - ${endTime}
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <span class="text-muted">Time not available</span>
+                                                </c:otherwise>
+                                            </c:choose>
                                         </div>
                                     </div>
                                     <div class="status-badge status-${fn:toLowerCase(appointment.status)}">

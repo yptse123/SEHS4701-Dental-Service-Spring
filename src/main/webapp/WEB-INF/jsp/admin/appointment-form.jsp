@@ -110,7 +110,9 @@
                                     <label for="appointmentDate">
                                         <i class="fas fa-calendar"></i> Date <span class="required">*</span>
                                     </label>
-                                    <form:input path="appointmentDate" type="date" id="appointmentDate" class="form-control" required="true" />
+                                    <c:set var="formattedInputDate" value="${DateTimeUtils.formatDateForHtmlInput(appointment.appointmentDate)}" />
+                                    <form:input path="appointmentDate" type="date" id="appointmentDate" class="form-control" required="true" 
+                                            value="${formattedInputDate}" />
                                     <form:errors path="appointmentDate" cssClass="text-danger" />
                                 </div>
                                 
