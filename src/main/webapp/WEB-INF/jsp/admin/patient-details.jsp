@@ -104,12 +104,19 @@
                                 </c:if>
                             </div>
                         </div>
-                        <div class="info-group">
-                            <div class="info-label">Status</div>
-                            <div class="info-value">
-                                <span class="status-badge ${patient.active ? 'status-active' : 'status-inactive'}">
-                                    ${patient.active ? 'Active' : 'Inactive'}
-                                </span>
+                        <div class="form-section">
+                            <div class="form-section-title">Status</div>
+                            
+                            <div class="form-group">
+                                <div class="form-check">
+                                    <!-- Fix: Proper checkbox binding with Spring form tags -->
+                                    <form:checkbox path="active" id="active" cssClass="form-check-input" />
+                                    <form:label path="active" cssClass="form-check-label">Active</form:label>
+                                    
+                                    <!-- This hidden field ensures false value is submitted when checkbox is unchecked -->
+                                    <input type="hidden" name="_active" value="on" />
+                                </div>
+                                <small class="text-muted">Active patients can book appointments and access the system.</small>
                             </div>
                         </div>
                     </div>

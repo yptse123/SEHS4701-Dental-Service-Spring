@@ -63,7 +63,16 @@
                             <div class="form-row">
                                 <div class="form-group">
                                     <form:label path="dateOfBirth">Date of Birth</form:label>
-                                    <form:input path="dateOfBirth" type="date" class="form-control" />
+                                    <!-- Change the form:input to regular input with formatted value -->
+                                    <c:choose>
+                                        <c:when test="${patient.dateOfBirth != null}">
+                                            <form:input path="dateOfBirth" type="date" class="form-control" 
+                                                value="${patient.dateOfBirth.toString()}" />
+                                        </c:when>
+                                        <c:otherwise>
+                                            <form:input path="dateOfBirth" type="date" class="form-control" />
+                                        </c:otherwise>
+                                    </c:choose>
                                     <form:errors path="dateOfBirth" cssClass="invalid-feedback" />
                                 </div>
 
