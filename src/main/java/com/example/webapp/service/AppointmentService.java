@@ -1,6 +1,7 @@
 package com.example.webapp.service;
 
 import com.example.webapp.model.Appointment;
+import com.example.webapp.model.Clinic;
 import com.example.webapp.model.Dentist;
 import com.example.webapp.model.Patient;
 
@@ -45,6 +46,8 @@ public interface AppointmentService {
          * Find appointments by patient ID
          */
         List<Appointment> findByPatientId(Long patientId);
+
+        List<Appointment> findByDentist(Dentist dentist);
 
         /**
          * Find appointments by dentist ID
@@ -125,7 +128,31 @@ public interface AppointmentService {
 
         Appointment findNextScheduledByPatient(Patient patient);
 
+        // Add these methods to the AppointmentService interface
+
         List<Appointment> findByDentistBetweenDates(Dentist dentist, LocalDate startDate, LocalDate endDate);
 
         List<Appointment> findByDentistBetweenDates(Dentist dentist, LocalDate startDate, LocalDate endDate, int limit);
+
+        List<Appointment> findByClinic(Clinic clinic);
+
+        List<Appointment> findByStatus(Appointment.Status status);
+
+        List<Appointment> findByAppointmentDate(LocalDate date);
+
+        List<Appointment> findByDentistWithFilters(
+                        Dentist dentist,
+                        String status,
+                        LocalDate startDate,
+                        LocalDate endDate,
+                        String patientName,
+                        int page,
+                        int size);
+
+        long countByDentistWithFilters(
+                        Dentist dentist,
+                        String status,
+                        LocalDate startDate,
+                        LocalDate endDate,
+                        String patientName);
 }

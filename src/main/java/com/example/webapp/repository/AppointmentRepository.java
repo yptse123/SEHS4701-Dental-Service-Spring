@@ -1,6 +1,7 @@
 package com.example.webapp.repository;
 
 import com.example.webapp.model.Appointment;
+import com.example.webapp.model.Clinic;
 import com.example.webapp.model.Dentist;
 import com.example.webapp.model.Patient;
 
@@ -53,11 +54,11 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long>,
          * Find conflicting appointments for a dentist (excluding an existing
          * appointment)
          */
-        @Query("SELECT a FROM Appointment a WHERE a.dentist.id = :dentistId " +
-                        "AND a.appointmentDate = :date " +
+        @Query("SELECT a FROM Appointment a WHERE a.dentist.id = :dentistId AND a.appointmentDate = :date " +
                         "AND a.id <> :excludeId " +
-                        "AND a.status = com.example.webapp.model.Appointment$Status.SCHEDULED " +
-                        "AND ((a.startTime <= :endTime AND a.endTime >= :startTime))")
+                        "AND ((a.startTime <= :endTime AND a.endTime > :startTime) OR " +
+                        "(a.startTime < :endTime AND a.endTime >= :endTime) OR " +
+                        "(a.startTime <= :startTime AND a.endTime >= :endTime))")
         List<Appointment> findConflictingAppointmentsExcludingSelf(
                         @Param("dentistId") Long dentistId,
                         @Param("date") LocalDate date,
@@ -68,10 +69,10 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long>,
         /**
          * Find conflicting appointments for a dentist
          */
-        @Query("SELECT a FROM Appointment a WHERE a.dentist.id = :dentistId " +
-                        "AND a.appointmentDate = :date " +
-                        "AND a.status = com.example.webapp.model.Appointment$Status.SCHEDULED " +
-                        "AND ((a.startTime <= :endTime AND a.endTime >= :startTime))")
+        @Query("SELECT a FROM Appointment a WHERE a.dentist.id = :dentistId AND a.appointmentDate = :date " +
+                        "AND ((a.startTime <= :endTime AND a.endTime > :startTime) OR " +
+                        "(a.startTime < :endTime AND a.endTime >= :endTime) OR " +
+                        "(a.startTime <= :startTime AND a.endTime >= :endTime))")
         List<Appointment> findConflictingAppointments(
                         @Param("dentistId") Long dentistId,
                         @Param("date") LocalDate date,
@@ -109,4 +110,12 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long>,
 
         Page<Appointment> findByDentistAndAppointmentDateBetween(
                         Dentist dentist, LocalDate startDate, LocalDate endDate, Pageable pageable);
+
+        List<Appointment> findByDentist(Dentist dentist);
+
+        List<Appointment> findByClinic(Clinic clinic);
+
+        List<Appointment> findByStatus(Appointment.Status status);
+
+        List<Appointment> findByAppointmentDate(LocalDate date);
 }

@@ -9,6 +9,7 @@ import com.example.webapp.repository.ClinicRepository;
 import com.example.webapp.repository.DentistRepository;
 import com.example.webapp.repository.PatientRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.criteria.Join;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -355,5 +356,132 @@ public class AppointmentServiceImpl implements AppointmentService {
         PageRequest pageRequest = PageRequest.of(0, limit, Sort.by(Sort.Direction.ASC, "appointmentDate", "startTime"));
         return appointmentRepository.findByDentistAndAppointmentDateBetween(dentist, startDate, endDate, pageRequest)
                 .getContent();
+    }
+
+    @Override
+    public List<Appointment> findByDentistWithFilters(
+            Dentist dentist,
+            String status,
+            LocalDate startDate,
+            LocalDate endDate,
+            String patientName,
+            int page,
+            int size) {
+
+        // Create specification for filtering
+        Specification<Appointment> spec = Specification.where(
+                (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("dentist"), dentist));
+
+        // Add status filter if provided
+        if (status != null && !status.isEmpty()) {
+            try {
+                Appointment.Status statusEnum = Appointment.Status.valueOf(status.toUpperCase());
+                spec = spec
+                        .and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("status"), statusEnum));
+            } catch (IllegalArgumentException e) {
+                // Invalid status, ignore this filter
+            }
+        }
+
+        // Add date range filter
+        if (startDate != null) {
+            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder
+                    .greaterThanOrEqualTo(root.get("appointmentDate"), startDate));
+        }
+
+        if (endDate != null) {
+            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder
+                    .lessThanOrEqualTo(root.get("appointmentDate"), endDate));
+        }
+
+        // Add patient name filter
+        if (patientName != null && !patientName.isEmpty()) {
+            spec = spec.and((root, query, criteriaBuilder) -> {
+                Join<Appointment, Patient> patientJoin = root.join("patient");
+                String pattern = "%" + patientName.toLowerCase() + "%";
+                return criteriaBuilder.or(
+                        criteriaBuilder.like(criteriaBuilder.lower(patientJoin.get("firstName")), pattern),
+                        criteriaBuilder.like(criteriaBuilder.lower(patientJoin.get("lastName")), pattern));
+            });
+        }
+
+        // Create pageable request
+        Pageable pageable = PageRequest.of(page, size, Sort.by(
+                Sort.Order.asc("appointmentDate"),
+                Sort.Order.asc("startTime")));
+
+        // Execute query
+        Page<Appointment> appointmentsPage = appointmentRepository.findAll(spec, pageable);
+
+        return appointmentsPage.getContent();
+    }
+
+    @Override
+    public long countByDentistWithFilters(
+            Dentist dentist,
+            String status,
+            LocalDate startDate,
+            LocalDate endDate,
+            String patientName) {
+
+        // Create specification for filtering - same as above but for counting
+        Specification<Appointment> spec = Specification.where(
+                (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("dentist"), dentist));
+
+        // Add status filter if provided
+        if (status != null && !status.isEmpty()) {
+            try {
+                Appointment.Status statusEnum = Appointment.Status.valueOf(status.toUpperCase());
+                spec = spec
+                        .and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("status"), statusEnum));
+            } catch (IllegalArgumentException e) {
+                // Invalid status, ignore this filter
+            }
+        }
+
+        // Add date range filter
+        if (startDate != null) {
+            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder
+                    .greaterThanOrEqualTo(root.get("appointmentDate"), startDate));
+        }
+
+        if (endDate != null) {
+            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder
+                    .lessThanOrEqualTo(root.get("appointmentDate"), endDate));
+        }
+
+        // Add patient name filter
+        if (patientName != null && !patientName.isEmpty()) {
+            spec = spec.and((root, query, criteriaBuilder) -> {
+                Join<Appointment, Patient> patientJoin = root.join("patient");
+                String pattern = "%" + patientName.toLowerCase() + "%";
+                return criteriaBuilder.or(
+                        criteriaBuilder.like(criteriaBuilder.lower(patientJoin.get("firstName")), pattern),
+                        criteriaBuilder.like(criteriaBuilder.lower(patientJoin.get("lastName")), pattern));
+            });
+        }
+
+        // Count matches
+        return appointmentRepository.count(spec);
+    }
+
+    @Override
+    public List<Appointment> findByDentist(Dentist dentist) {
+        return appointmentRepository.findByDentist(dentist);
+    }
+
+    @Override
+    public List<Appointment> findByClinic(Clinic clinic) {
+        return appointmentRepository.findByClinic(clinic);
+    }
+
+    @Override
+    public List<Appointment> findByStatus(Appointment.Status status) {
+        return appointmentRepository.findByStatus(status);
+    }
+
+    @Override
+    public List<Appointment> findByAppointmentDate(LocalDate date) {
+        return appointmentRepository.findByAppointmentDate(date);
     }
 }
