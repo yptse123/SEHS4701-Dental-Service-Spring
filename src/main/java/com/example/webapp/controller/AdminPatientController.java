@@ -91,8 +91,9 @@ public class AdminPatientController {
             @RequestParam(required = false) String email,
             RedirectAttributes redirectAttributes) {
         try {
-            if (patient.getId() != null) { // FIXED: This was == null before
-                // Existing patient - load from database
+            // Update existing patient
+            if (patient.getId() != null) {
+                // Load the existing patient to preserve relationships
                 Patient existingPatient = patientService.findById(patient.getId())
                         .orElseThrow(() -> new EntityNotFoundException("Patient not found"));
 
@@ -102,32 +103,61 @@ public class AdminPatientController {
                 existingPatient.setPhoneNumber(patient.getPhoneNumber());
                 existingPatient.setDateOfBirth(patient.getDateOfBirth());
                 existingPatient.setAddress(patient.getAddress());
-
-                // Explicitly set active status
                 existingPatient.setActive(patient.isActive());
-
-                // Debug
-                System.out.println("Updating patient #" + patient.getId() + ", active status: " + patient.isActive());
-
-                // Update timestamp
                 existingPatient.setUpdatedAt(LocalDateTime.now());
 
                 // Save the updated patient
                 patientService.save(existingPatient);
                 redirectAttributes.addFlashAttribute("successMessage", "Patient updated successfully");
-            } else {
-                // This is an existing patient, load current patient to preserve user
-                // relationship
-                Patient existingPatient = patientService.findById(patient.getId())
-                        .orElseThrow(() -> new RuntimeException("Patient not found"));
-                patient.setUser(existingPatient.getUser());
+            }
+            // Create new patient
+            else {
+                // First, validate username and email
+                if (username == null || username.isEmpty()) {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Username is required");
+                    return "redirect:/admin/patients/new";
+                }
 
+                if (email == null || email.isEmpty()) {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Email is required");
+                    return "redirect:/admin/patients/new";
+                }
+
+                // Check if username or email already exists
+                if (userService.existsByUsername(username)) {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Username already exists");
+                    return "redirect:/admin/patients/new";
+                }
+
+                if (userService.existsByEmail(email)) {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Email already exists");
+                    return "redirect:/admin/patients/new";
+                }
+
+                // Create and save new user first
+                User newUser = new User();
+                newUser.setUsername(username);
+                newUser.setEmail(email);
+                newUser.setRole(User.Role.PATIENT);
+                // Set default password (in production, you'd send a password reset email)
+                newUser.setPassword("$2a$10$v06WAFp7ldRMTTVm59iDGeLqsIOAtFY.fD0IqPppEVSmTlW79b3P.");
+
+                User savedUser = userService.save(newUser);
+
+                // Now set the saved user to the patient
+                patient.setUser(savedUser);
+                patient.setActive(true);
+                patient.setCreatedAt(LocalDateTime.now());
+                patient.setUpdatedAt(LocalDateTime.now());
+
+                // Save the patient
                 patientService.save(patient);
                 redirectAttributes.addFlashAttribute("successMessage", "Patient created successfully");
             }
 
             return "redirect:/admin/patients";
         } catch (Exception e) {
+            e.printStackTrace(); // For debugging
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             return "redirect:/admin/patients";
         }

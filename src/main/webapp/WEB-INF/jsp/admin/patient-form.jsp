@@ -104,21 +104,19 @@
 
                         <!-- User Account Information (Only shown for new patients) -->
                         <c:if test="${patient.id == null}">
-                            <input type="hidden" name="userId" value="${user.id}" />
+                            <!-- REMOVE THIS LINE: <input type="hidden" name="userId" value="${user.id}" /> -->
                             <div class="form-section">
                                 <div class="form-section-title">Account Information</div>
 
                                 <div class="form-group">
                                     <label for="username">Username <span class="required">*</span></label>
-                                    <input type="text" id="username" name="username" class="form-control" value="${user.username}" required />
-                                    <form:errors path="user.username" cssClass="invalid-feedback" />
+                                    <input type="text" id="username" name="username" class="form-control" required />
                                     <small class="text-muted">The username will be used for login.</small>
                                 </div>
 
                                 <div class="form-group">
                                     <label for="email">Email <span class="required">*</span></label>
-                                    <input type="email" id="email" name="email" class="form-control" value="${user.email}" required />
-                                    <form:errors path="user.email" cssClass="invalid-feedback" />
+                                    <input type="email" id="email" name="email" class="form-control" required />
                                 </div>
                             </div>
                         </c:if>
