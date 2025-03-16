@@ -74,49 +74,46 @@
                         </div>
 
                         <!-- User Account Information (Only shown for new dentists) -->
-                        <c:if test="${dentist.id == null}">
-                            <div class="form-section">
-                                <div class="form-section-title">Account Information</div>
-
-                                <div class="form-group">
-                                    <form:label path="user.username">Username <span class="required">*</span></form:label>
-                                    <form:input path="user.username" class="form-control" required="true" />
-                                    <form:errors path="user.username" cssClass="invalid-feedback" />
-                                    <small class="text-muted">The username will be used for login.</small>
-                                </div>
-
-                                <div class="form-group">
-                                    <form:label path="user.email">Email <span class="required">*</span></form:label>
-                                    <form:input path="user.email" class="form-control" type="email" required="true" />
-                                    <form:errors path="user.email" cssClass="invalid-feedback" />
-                                </div>
-                            </div>
-                        </c:if>
+                        <div class="form-section">
+                            <div class="form-section-title">Account Information</div>
+                            
+                            <!-- For new dentists -->
+                            <c:choose>
+                                <c:when test="${dentist.id == null}">
+                                    <div class="form-group">
+                                        <label for="username">Username <span class="required">*</span></label>
+                                        <input type="text" id="username" name="username" class="form-control" required>
+                                        <small class="text-muted">The username will be used for login.</small>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="email">Email <span class="required">*</span></label>
+                                        <input type="email" id="email" name="email" class="form-control" required>
+                                        <small class="text-muted">Email address for account recovery and notifications.</small>
+                                    </div>
+                                </c:when>
+                                <c:otherwise>
+                                    <!-- For existing dentists -->
+                                    <div class="form-group">
+                                        <label>Username</label>
+                                        <input type="text" class="form-control" value="${dentistUser.username}" disabled readonly />
+                                        <small class="text-muted">Username cannot be changed.</small>
+                                    </div>
                         
-                        <!-- For existing dentists, just show the email (read-only) -->
-                        <c:if test="${dentist.id != null}">
-                            <div class="form-section">
-                                <div class="form-section-title">Account Information</div>
-
-                                <div class="form-group">
-                                    <label>Username</label>
-                                    <input type="text" class="form-control" value="${dentistUser.username}" readonly />
-                                    <small class="text-muted">Username cannot be changed.</small>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Email</label>
-                                    <input type="text" class="form-control" value="${dentistUser.email}" readonly />
-                                </div>
-                                
-                                <div class="form-check">
-                                    <input type="hidden" name="active" value="false" />
-                                    <form:checkbox path="active" id="activeCheck" class="form-check-input" />
-                                    <form:label path="active" cssClass="form-check-label" for="activeCheck">Active</form:label>
-                                    <div class="text-muted small">Inactive dentists won't appear in patient-facing pages</div>
-                                </div>
-                            </div>
-                        </c:if>
+                                    <div class="form-group">
+                                        <label>Email</label>
+                                        <input type="text" class="form-control" value="${dentistUser.email}" disabled readonly />
+                                        <small class="text-muted">Email cannot be changed.</small>
+                                    </div>
+                                    
+                                    <div class="form-check">
+                                        <form:checkbox path="active" id="activeCheck" class="form-check-input" />
+                                        <form:label path="active" cssClass="form-check-label" for="activeCheck">Active</form:label>
+                                        <div class="text-muted small">Inactive dentists won't appear in patient-facing pages</div>
+                                    </div>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
 
                         <!-- Clinic Assignments -->
                         <div class="form-section">

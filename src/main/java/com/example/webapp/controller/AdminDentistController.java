@@ -93,17 +93,16 @@ public class AdminDentistController {
     public String saveDentist(
             @Valid @ModelAttribute("dentist") Dentist dentist,
             BindingResult dentistResult,
-            // REMOVE THIS PARAMETER - it's causing the ID conflict:
-            // @Valid @ModelAttribute("user") User user,
-            // BindingResult userResult,
+            // Add these parameters back, but modify how they're used:
+            @RequestParam(required = false) String username,
+            @RequestParam(required = false) String email,
             @RequestParam(required = false) Long primaryClinicId,
             @RequestParam(required = false) List<Long> secondaryClinicIds,
             Model model,
             RedirectAttributes redirectAttributes) {
 
         try {
-            // Instead of just setting user to null, use a more direct approach for existing
-            // dentists
+            // Case 1: This is an existing dentist - KEEP THIS PART
             if (dentist.getId() != null) {
                 // Load existing dentist with its proper user relationship
                 Dentist existingDentist = dentistService.findById(dentist.getId())
@@ -118,10 +117,61 @@ public class AdminDentistController {
 
                 // Use the existing dentist with its proper user reference
                 dentist = existingDentist;
-            }
 
-            // Save the dentist
-            dentist = dentistService.save(dentist);
+                // Save the updated dentist
+                dentist = dentistService.save(dentist);
+
+                // Set success message for update
+                redirectAttributes.addFlashAttribute("successMessage", "Dentist updated successfully");
+            }
+            // Case 2: This is a new dentist - ADD THIS PART BACK
+            else {
+                // Validate username and email
+                if (username == null || username.isEmpty()) {
+                    model.addAttribute("errorMessage", "Username is required");
+                    model.addAttribute("clinics", clinicService.findAllActive());
+                    return "admin/dentist-form";
+                }
+
+                if (email == null || email.isEmpty()) {
+                    model.addAttribute("errorMessage", "Email is required");
+                    model.addAttribute("clinics", clinicService.findAllActive());
+                    return "admin/dentist-form";
+                }
+
+                // Check if username or email already exists
+                if (userService.existsByUsername(username)) {
+                    model.addAttribute("errorMessage", "Username already exists");
+                    model.addAttribute("clinics", clinicService.findAllActive());
+                    return "admin/dentist-form";
+                }
+
+                if (userService.existsByEmail(email)) {
+                    model.addAttribute("errorMessage", "Email already exists");
+                    model.addAttribute("clinics", clinicService.findAllActive());
+                    return "admin/dentist-form";
+                }
+
+                // Create and save the User first
+                User newUser = new User();
+                newUser.setUsername(username);
+                newUser.setEmail(email);
+                newUser.setRole(User.Role.DENTIST);
+                newUser.setPassword("$2a$10$v06WAFp7ldRMTTVm59iDGeLqsIOAtFY.fD0IqPppEVSmTlW79b3P."); // Default password
+
+                // Save the user first
+                User savedUser = userService.save(newUser);
+
+                // Now associate it with the dentist
+                dentist.setUser(savedUser);
+                dentist.setActive(true);
+
+                // Save the dentist
+                dentist = dentistService.save(dentist);
+
+                // Set success message for creation
+                redirectAttributes.addFlashAttribute("successMessage", "Dentist created successfully");
+            }
 
             // Handle clinic assignments
             if (primaryClinicId != null) {
@@ -132,9 +182,9 @@ public class AdminDentistController {
                 dentistService.assignSecondaryClinics(dentist.getId(), secondaryClinicIds);
             }
 
-            redirectAttributes.addFlashAttribute("successMessage", "Dentist updated successfully");
             return "redirect:/admin/dentists";
         } catch (Exception e) {
+            e.printStackTrace(); // Add this for debugging
             redirectAttributes.addFlashAttribute("errorMessage", "Error: " + e.getMessage());
             return "redirect:/admin/dentists";
         }
