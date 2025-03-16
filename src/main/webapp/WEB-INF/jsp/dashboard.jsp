@@ -363,11 +363,11 @@
                                             <a href="<c:url value='/admin/appointments'/>" class="btn-primary">View</a>
                                         </div>
 
-                                        <div class="action-card">
+                                        <!-- <div class="action-card">
                                             <i class="fas fa-chart-bar"></i>
                                             <h3>Reports</h3>
                                             <a href="<c:url value='/admin/reports'/>" class="btn-primary">View</a>
-                                        </div>
+                                        </div> -->
                                     </div>
                                 </div>
                             </sec:authorize>
