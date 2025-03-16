@@ -35,12 +35,12 @@ public class PatientServiceImpl implements PatientService {
         if (patient.getId() != null) {
             // Load the existing patient to preserve relationships
             Patient existingPatient = patientRepository.findById(patient.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Patient not found"));
-            
+                    .orElseThrow(() -> new EntityNotFoundException("Patient not found"));
+
             // Keep the existing User reference to prevent ID changes
             User existingUser = existingPatient.getUser();
             patient.setUser(existingUser);
-            
+
             // Preserve creation timestamp
             patient.setCreatedAt(existingPatient.getCreatedAt());
         }
@@ -48,15 +48,15 @@ public class PatientServiceImpl implements PatientService {
         else if (patient.getUser() != null && patient.getUser().getId() != null) {
             // Load the actual user from the database to get a managed entity
             User managedUser = userRepository.findById(patient.getUser().getId().longValue())
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
-            
+                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
             patient.setUser(managedUser);
             patient.setCreatedAt(LocalDateTime.now());
         }
-        
+
         // Always update the timestamp
         patient.setUpdatedAt(LocalDateTime.now());
-        
+
         return patientRepository.save(patient);
     }
 
@@ -127,13 +127,13 @@ public class PatientServiceImpl implements PatientService {
 
     @Override
     @Transactional
-    public Patient createPatientWithUser(User user, String firstName, String lastName, 
-                                     String dateOfBirth, String phoneNumber, String address) {
+    public Patient createPatientWithUser(User user, String firstName, String lastName,
+            String dateOfBirth, String phoneNumber, String address) {
         Patient patient = new Patient();
         patient.setUser(user);
         patient.setFirstName(firstName);
         patient.setLastName(lastName);
-        
+
         // Parse date of birth if provided
         if (dateOfBirth != null && !dateOfBirth.isEmpty()) {
             try {
@@ -144,13 +144,18 @@ public class PatientServiceImpl implements PatientService {
                 throw new IllegalArgumentException("Invalid date format for date of birth", e);
             }
         }
-        
+
         patient.setPhoneNumber(phoneNumber);
         patient.setAddress(address);
         patient.setActive(true);
         patient.setCreatedAt(LocalDateTime.now());
         patient.setUpdatedAt(LocalDateTime.now());
-        
+
         return patientRepository.save(patient);
+    }
+
+    @Override
+    public long countAllActive() {
+        return patientRepository.countByActiveTrue();
     }
 }

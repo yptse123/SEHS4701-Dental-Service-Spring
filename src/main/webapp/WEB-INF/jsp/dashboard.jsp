@@ -173,7 +173,7 @@
                                         </div>
                                         <div class="card-info">
                                             <h3>Total Patients</h3>
-                                            <p class="card-value">${totalPatientsCount}</p>
+                                            <p class="card-value">${patientsCount}</p>
                                         </div>
                                     </div>
                                 </div>

@@ -16,44 +16,48 @@ import java.util.Optional;
 @Repository
 public interface PatientRepository extends JpaRepository<Patient, Long> {
 
-    /**
-     * Find patient by user
-     */
-    Optional<Patient> findByUser(User user);
-    
-    /**
-     * Check if patient exists for user ID
-     */
-    boolean existsByUserId(Long userId);
-    
-    /**
-     * Find all active patients - FIX: Changed Patients to Patient
-     */
-    @Query("SELECT p FROM Patient p WHERE p.active = true")
-    List<Patient> findAllActive();
-    
-    /**
-     * Find patients by active status with pagination
-     */
-    Page<Patient> findByActiveTrue(Pageable pageable);
-    
-    /**
-     * Search patients by keyword (name, email, phone) - FIX: Changed Patients to Patient
-     */
-    @Query("SELECT p FROM Patient p WHERE " +
-           "LOWER(p.firstName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-           "LOWER(p.lastName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-           "LOWER(p.user.email) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-           "p.phoneNumber LIKE CONCAT('%', :keyword, '%')")
-    List<Patient> search(@Param("keyword") String keyword);
-    
-    /**
-     * Search patients by keyword with pagination - FIX: Changed Patients to Patient
-     */
-    @Query("SELECT p FROM Patient p WHERE " +
-           "LOWER(p.firstName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-           "LOWER(p.lastName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-           "LOWER(p.user.email) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-           "p.phoneNumber LIKE CONCAT('%', :keyword, '%')")
-    Page<Patient> search(@Param("keyword") String keyword, Pageable pageable);
+       /**
+        * Find patient by user
+        */
+       Optional<Patient> findByUser(User user);
+
+       /**
+        * Check if patient exists for user ID
+        */
+       boolean existsByUserId(Long userId);
+
+       /**
+        * Find all active patients - FIX: Changed Patients to Patient
+        */
+       @Query("SELECT p FROM Patient p WHERE p.active = true")
+       List<Patient> findAllActive();
+
+       /**
+        * Find patients by active status with pagination
+        */
+       Page<Patient> findByActiveTrue(Pageable pageable);
+
+       /**
+        * Search patients by keyword (name, email, phone) - FIX: Changed Patients to
+        * Patient
+        */
+       @Query("SELECT p FROM Patient p WHERE " +
+                     "LOWER(p.firstName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+                     "LOWER(p.lastName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+                     "LOWER(p.user.email) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+                     "p.phoneNumber LIKE CONCAT('%', :keyword, '%')")
+       List<Patient> search(@Param("keyword") String keyword);
+
+       /**
+        * Search patients by keyword with pagination - FIX: Changed Patients to Patient
+        */
+       @Query("SELECT p FROM Patient p WHERE " +
+                     "LOWER(p.firstName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+                     "LOWER(p.lastName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+                     "LOWER(p.user.email) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+                     "p.phoneNumber LIKE CONCAT('%', :keyword, '%')")
+       Page<Patient> search(@Param("keyword") String keyword, Pageable pageable);
+
+       @Query("SELECT COUNT(p) FROM Patient p WHERE p.active = true")
+       long countByActiveTrue();
 }

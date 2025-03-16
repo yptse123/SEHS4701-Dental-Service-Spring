@@ -20,8 +20,8 @@ public class ClinicServiceImpl implements ClinicService {
     private final ClinicRepository clinicRepository;
     private final DentistClinicAssignmentRepository assignmentRepository;
 
-    public ClinicServiceImpl(ClinicRepository clinicRepository, 
-                             DentistClinicAssignmentRepository assignmentRepository) {
+    public ClinicServiceImpl(ClinicRepository clinicRepository,
+            DentistClinicAssignmentRepository assignmentRepository) {
         this.clinicRepository = clinicRepository;
         this.assignmentRepository = assignmentRepository;
     }
@@ -81,9 +81,9 @@ public class ClinicServiceImpl implements ClinicService {
     @Transactional
     public void assignDentistToClinic(Dentist dentist, Clinic clinic, boolean isPrimary) {
         // Check if assignment already exists
-        Optional<DentistClinicAssignment> existingAssignment = 
-            assignmentRepository.findByDentistIdAndClinicId(dentist.getId(), clinic.getId());
-        
+        Optional<DentistClinicAssignment> existingAssignment = assignmentRepository
+                .findByDentistIdAndClinicId(dentist.getId(), clinic.getId());
+
         if (existingAssignment.isPresent()) {
             DentistClinicAssignment assignment = existingAssignment.get();
             assignment.setPrimary(isPrimary);
@@ -99,5 +99,10 @@ public class ClinicServiceImpl implements ClinicService {
     @Transactional
     public void removeDentistFromClinic(Dentist dentist, Clinic clinic) {
         assignmentRepository.deleteByDentistIdAndClinicId(dentist.getId(), clinic.getId());
+    }
+
+    @Override
+    public long countAllActive() {
+        return clinicRepository.countByActiveTrue();
     }
 }

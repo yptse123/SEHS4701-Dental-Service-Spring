@@ -11,7 +11,9 @@ import com.example.webapp.repository.PatientRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -54,15 +56,15 @@ public class AppointmentServiceImpl implements AppointmentService {
             // For demo purposes, setting a default date
             appointment.setAppointmentDate(LocalDate.now());
         }
-        
+
         if (appointment.getStartTime() == null) {
             appointment.setStartTime(LocalTime.of(9, 0));
         }
-        
+
         if (appointment.getEndTime() == null) {
             appointment.setEndTime(LocalTime.of(10, 0));
         }
-        
+
         return appointment;
     }
 
@@ -73,35 +75,35 @@ public class AppointmentServiceImpl implements AppointmentService {
         if (appointment.getId() == null && appointment.getStatus() == null) {
             appointment.setStatus(Appointment.Status.SCHEDULED);
         }
-        
+
         // Set created/updated timestamps
         LocalDateTime now = LocalDateTime.now();
         if (appointment.getCreatedAt() == null) {
             appointment.setCreatedAt(now);
         }
         appointment.setUpdatedAt(now);
-        
+
         // Check if patient exists
         if (appointment.getPatient() != null && appointment.getPatient().getId() != null) {
             Patient patient = patientRepository.findById(appointment.getPatient().getId())
                     .orElseThrow(() -> new EntityNotFoundException("Patient not found"));
             appointment.setPatient(patient);
         }
-        
+
         // Check if dentist exists
         if (appointment.getDentist() != null && appointment.getDentist().getId() != null) {
             Dentist dentist = dentistRepository.findById(appointment.getDentist().getId())
                     .orElseThrow(() -> new EntityNotFoundException("Dentist not found"));
             appointment.setDentist(dentist);
         }
-        
+
         // Check if clinic exists
         if (appointment.getClinic() != null && appointment.getClinic().getId() != null) {
             Clinic clinic = clinicRepository.findById(appointment.getClinic().getId())
                     .orElseThrow(() -> new EntityNotFoundException("Clinic not found"));
             appointment.setClinic(clinic);
         }
-        
+
         // Check for schedule conflicts
         if (!isDentistAvailable(
                 appointment.getDentist().getId(),
@@ -111,7 +113,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 appointment.getId())) {
             throw new RuntimeException("Dentist is already booked during this time slot");
         }
-        
+
         return appointmentRepository.save(appointment);
     }
 
@@ -125,55 +127,54 @@ public class AppointmentServiceImpl implements AppointmentService {
             LocalDate startDate,
             LocalDate endDate,
             Pageable pageable) {
-        
+
         // Build specifications for filtering
         Specification<Appointment> spec = Specification.where(null);
-        
+
         // Add keyword search if provided
         if (keyword != null && !keyword.trim().isEmpty()) {
             spec = spec.and((root, query, cb) -> {
                 String pattern = "%" + keyword.toLowerCase() + "%";
                 return cb.or(
-                    cb.like(cb.lower(root.get("notes")), pattern),
-                    cb.like(cb.lower(root.join("patient").get("firstName")), pattern),
-                    cb.like(cb.lower(root.join("patient").get("lastName")), pattern),
-                    cb.like(cb.lower(root.join("dentist").get("firstName")), pattern),
-                    cb.like(cb.lower(root.join("dentist").get("lastName")), pattern),
-                    cb.like(cb.lower(root.join("clinic").get("name")), pattern)
-                );
+                        cb.like(cb.lower(root.get("notes")), pattern),
+                        cb.like(cb.lower(root.join("patient").get("firstName")), pattern),
+                        cb.like(cb.lower(root.join("patient").get("lastName")), pattern),
+                        cb.like(cb.lower(root.join("dentist").get("firstName")), pattern),
+                        cb.like(cb.lower(root.join("dentist").get("lastName")), pattern),
+                        cb.like(cb.lower(root.join("clinic").get("name")), pattern));
             });
         }
-        
+
         // Filter by patient
         if (patientId != null) {
             spec = spec.and((root, query, cb) -> cb.equal(root.join("patient").get("id"), patientId));
         }
-        
+
         // Filter by dentist
         if (dentistId != null) {
             spec = spec.and((root, query, cb) -> cb.equal(root.join("dentist").get("id"), dentistId));
         }
-        
+
         // Filter by clinic
         if (clinicId != null) {
             spec = spec.and((root, query, cb) -> cb.equal(root.join("clinic").get("id"), clinicId));
         }
-        
+
         // Filter by status
         if (status != null && !status.isEmpty()) {
             Appointment.Status statusEnum = Appointment.Status.valueOf(status);
             spec = spec.and((root, query, cb) -> cb.equal(root.get("status"), statusEnum));
         }
-        
+
         // Filter by date range
         if (startDate != null) {
             spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("appointmentDate"), startDate));
         }
-        
+
         if (endDate != null) {
             spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("appointmentDate"), endDate));
         }
-        
+
         return appointmentRepository.findAll(spec, pageable);
     }
 
@@ -204,22 +205,24 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     public List<Appointment> findUpcomingAppointmentsByPatientId(Long patientId) {
-        return appointmentRepository.findByPatientIdAndAppointmentDateGreaterThanEqualAndStatusOrderByAppointmentDateAscStartTimeAsc(
-                patientId, LocalDate.now(), Appointment.Status.SCHEDULED);
+        return appointmentRepository
+                .findByPatientIdAndAppointmentDateGreaterThanEqualAndStatusOrderByAppointmentDateAscStartTimeAsc(
+                        patientId, LocalDate.now(), Appointment.Status.SCHEDULED);
     }
 
     @Override
     public List<Appointment> findUpcomingAppointmentsByDentistId(Long dentistId) {
-        return appointmentRepository.findByDentistIdAndAppointmentDateGreaterThanEqualAndStatusOrderByAppointmentDateAscStartTimeAsc(
-                dentistId, LocalDate.now(), Appointment.Status.SCHEDULED);
+        return appointmentRepository
+                .findByDentistIdAndAppointmentDateGreaterThanEqualAndStatusOrderByAppointmentDateAscStartTimeAsc(
+                        dentistId, LocalDate.now(), Appointment.Status.SCHEDULED);
     }
 
     @Override
-    public boolean isDentistAvailable(Long dentistId, LocalDate date, 
+    public boolean isDentistAvailable(Long dentistId, LocalDate date,
             LocalTime startTime, LocalTime endTime, Long excludeAppointmentId) {
-        
+
         List<Appointment> conflicts;
-        
+
         if (excludeAppointmentId != null) {
             conflicts = appointmentRepository.findConflictingAppointmentsExcludingSelf(
                     dentistId, date, startTime, endTime, excludeAppointmentId);
@@ -227,7 +230,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             conflicts = appointmentRepository.findConflictingAppointments(
                     dentistId, date, startTime, endTime);
         }
-        
+
         return conflicts.isEmpty();
     }
 
@@ -236,10 +239,10 @@ public class AppointmentServiceImpl implements AppointmentService {
     public void cancel(Long id) {
         Appointment appointment = findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Appointment not found"));
-        
+
         appointment.setStatus(Appointment.Status.CANCELLED);
         appointment.setUpdatedAt(LocalDateTime.now());
-        
+
         appointmentRepository.save(appointment);
     }
 
@@ -248,10 +251,10 @@ public class AppointmentServiceImpl implements AppointmentService {
     public void complete(Long id) {
         Appointment appointment = findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Appointment not found"));
-        
+
         appointment.setStatus(Appointment.Status.COMPLETED);
         appointment.setUpdatedAt(LocalDateTime.now());
-        
+
         appointmentRepository.save(appointment);
     }
 
@@ -260,10 +263,10 @@ public class AppointmentServiceImpl implements AppointmentService {
     public void markNoShow(Long id) {
         Appointment appointment = findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Appointment not found"));
-        
+
         appointment.setStatus(Appointment.Status.NO_SHOW);
         appointment.setUpdatedAt(LocalDateTime.now());
-        
+
         appointmentRepository.save(appointment);
     }
 
@@ -271,5 +274,72 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Transactional
     public void delete(Long id) {
         appointmentRepository.deleteById(id);
+    }
+
+    @Override
+    public long countAllActive() {
+        return appointmentRepository.countActiveAppointments();
+    }
+
+    @Override
+    public long countActiveByDate(LocalDate date) {
+        return appointmentRepository.countActiveAppointmentsByDate(date);
+    }
+
+    @Override
+    public List<Appointment> findRecentAppointments(int limit) {
+        PageRequest pageRequest = PageRequest.of(0, limit,
+                Sort.by(Sort.Direction.DESC, "appointmentDate", "startTime"));
+        return appointmentRepository.findAll(pageRequest).getContent();
+    }
+
+    @Override
+    public long countAppointmentsBetweenDates(LocalDate startDate, LocalDate endDate) {
+        return appointmentRepository.countByAppointmentDateBetween(startDate, endDate);
+    }
+
+    @Override
+    public long countByStatus(Appointment.Status status) {
+        return appointmentRepository.countByStatus(status);
+    }
+
+    @Override
+    public List<Appointment> findByDentistAndDate(Dentist dentist, LocalDate date) {
+        return appointmentRepository.findByDentistAndAppointmentDateOrderByStartTimeAsc(dentist, date);
+    }
+
+    @Override
+    public List<Appointment> findUpcomingByDentist(Dentist dentist, LocalDate startDate, LocalDate endDate, int limit) {
+        PageRequest pageRequest = PageRequest.of(0, limit, Sort.by(Sort.Direction.ASC, "appointmentDate", "startTime"));
+        return appointmentRepository.findByDentistAndAppointmentDateBetweenAndStatus(
+                dentist, startDate, endDate, Appointment.Status.SCHEDULED, pageRequest);
+    }
+
+    @Override
+    public long countByDentistBetweenDates(Dentist dentist, LocalDate startDate, LocalDate endDate) {
+        return appointmentRepository.countByDentistAndAppointmentDateBetween(dentist, startDate, endDate);
+    }
+
+    @Override
+    public List<Appointment> findByPatient(Patient patient, int limit) {
+        PageRequest pageRequest = PageRequest.of(0, limit,
+                Sort.by(Sort.Direction.DESC, "appointmentDate", "startTime"));
+        return appointmentRepository.findByPatient(patient, pageRequest);
+    }
+
+    @Override
+    public Appointment findLastCompletedByPatient(Patient patient) {
+        PageRequest pageRequest = PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "appointmentDate", "startTime"));
+        List<Appointment> completed = appointmentRepository.findByPatientAndStatus(
+                patient, Appointment.Status.COMPLETED, pageRequest);
+        return completed.isEmpty() ? null : completed.get(0);
+    }
+
+    @Override
+    public Appointment findNextScheduledByPatient(Patient patient) {
+        PageRequest pageRequest = PageRequest.of(0, 1, Sort.by(Sort.Direction.ASC, "appointmentDate", "startTime"));
+        List<Appointment> scheduled = appointmentRepository.findByPatientAndStatusAndAppointmentDateGreaterThanEqual(
+                patient, Appointment.Status.SCHEDULED, LocalDate.now(), pageRequest);
+        return scheduled.isEmpty() ? null : scheduled.get(0);
     }
 }

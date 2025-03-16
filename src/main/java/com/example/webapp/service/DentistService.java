@@ -118,4 +118,9 @@ public interface DentistService {
      * Find active dentists by clinic ID
      */
     List<Dentist> findActiveByClinicId(Long clinicId);
+
+    /**
+     * Count all active dentists
+     */
+    long countAllActive();
 }

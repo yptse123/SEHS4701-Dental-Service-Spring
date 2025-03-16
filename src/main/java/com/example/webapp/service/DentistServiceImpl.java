@@ -274,4 +274,9 @@ public class DentistServiceImpl implements DentistService {
     public List<Dentist> findActiveByClinicId(Long clinicId) {
         return dentistRepository.findActiveByClinicId(clinicId);
     }
+
+    @Override
+    public long countAllActive() {
+        return dentistRepository.countByActiveTrue();
+    }
 }
