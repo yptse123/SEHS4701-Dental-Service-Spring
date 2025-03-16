@@ -6,6 +6,8 @@ import com.example.webapp.model.DentistClinicAssignment;
 import com.example.webapp.model.User;
 import com.example.webapp.repository.DentistRepository;
 
+import jakarta.persistence.EntityNotFoundException;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -31,10 +33,26 @@ public class DentistServiceImpl implements DentistService {
     @Override
     @Transactional
     public Dentist save(Dentist dentist) {
-        if (dentist.getId() == null) {
-            dentist.setCreatedAt(LocalDateTime.now());
+        // For existing dentists, we need to ensure we don't change the user
+        // relationship
+        if (dentist.getId() != null) {
+            // Load the existing dentist from the database
+            Dentist existingDentist = dentistRepository.findById(dentist.getId())
+                    .orElseThrow(() -> new EntityNotFoundException("Dentist not found"));
+
+            // ALWAYS use the existing user - never accept a user from the form for existing
+            // dentists
+            dentist.setUser(existingDentist.getUser());
+
+            // Preserve created date
+            if (dentist.getCreatedAt() == null) {
+                dentist.setCreatedAt(existingDentist.getCreatedAt());
+            }
         }
+
+        // Always set updated timestamp
         dentist.setUpdatedAt(LocalDateTime.now());
+
         return dentistRepository.save(dentist);
     }
 

@@ -19,7 +19,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -88,64 +90,54 @@ public class AdminDentistController {
     }
 
     @PostMapping
-    public String saveDentist(@Valid @ModelAttribute("dentist") Dentist dentist,
+    public String saveDentist(
+            @Valid @ModelAttribute("dentist") Dentist dentist,
             BindingResult dentistResult,
-            @Valid @ModelAttribute("user") User user,
-            BindingResult userResult,
+            // REMOVE THIS PARAMETER - it's causing the ID conflict:
+            // @Valid @ModelAttribute("user") User user,
+            // BindingResult userResult,
             @RequestParam(required = false) Long primaryClinicId,
             @RequestParam(required = false) List<Long> secondaryClinicIds,
             Model model,
             RedirectAttributes redirectAttributes) {
 
-        // Add current user to model in case we need to return to the form
-        addUserToModel(model);
+        try {
+            // Instead of just setting user to null, use a more direct approach for existing
+            // dentists
+            if (dentist.getId() != null) {
+                // Load existing dentist with its proper user relationship
+                Dentist existingDentist = dentistService.findById(dentist.getId())
+                        .orElseThrow(() -> new EntityNotFoundException("Dentist not found"));
 
-        // Check if it's an update or create
-        boolean isNew = dentist.getId() == null;
+                // Set key fields from the form to the existing record
+                existingDentist.setFirstName(dentist.getFirstName());
+                existingDentist.setLastName(dentist.getLastName());
+                existingDentist.setSpecialization(dentist.getSpecialization());
+                existingDentist.setBio(dentist.getBio());
+                existingDentist.setActive(dentist.isActive());
 
-        if (isNew) {
-            dentist.setActive(true);
+                // Use the existing dentist with its proper user reference
+                dentist = existingDentist;
+            }
+
+            // Save the dentist
+            dentist = dentistService.save(dentist);
+
+            // Handle clinic assignments
+            if (primaryClinicId != null) {
+                dentistService.assignPrimaryClinic(dentist.getId(), primaryClinicId);
+            }
+
+            if (secondaryClinicIds != null && !secondaryClinicIds.isEmpty()) {
+                dentistService.assignSecondaryClinics(dentist.getId(), secondaryClinicIds);
+            }
+
+            redirectAttributes.addFlashAttribute("successMessage", "Dentist updated successfully");
+            return "redirect:/admin/dentists";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error: " + e.getMessage());
+            return "redirect:/admin/dentists";
         }
-
-        // Validate the user if it's a new dentist
-        if (isNew && userService.existsByUsername(user.getUsername())) {
-            userResult.rejectValue("username", "error.user", "Username already exists");
-        }
-
-        if (isNew && userService.existsByEmail(user.getEmail())) {
-            userResult.rejectValue("email", "error.user", "Email already exists");
-        }
-
-        // If there are errors, return to the form
-        if (dentistResult.hasErrors() || userResult.hasErrors()) {
-            model.addAttribute("clinics", clinicService.findAllActive());
-            return "admin/dentist-form";
-        }
-        // If creating a new dentist, first create the user
-        if (isNew) {
-            user.setRole(User.Role.DENTIST); // Using the enum value instead of string
-            // Set default password (in a real app, send a password reset email)
-            user.setPassword("$2a$10$v06WAFp7ldRMTTVm59iDGeLqsIOAtFY.fD0IqPppEVSmTlW79b3P."); // "password"
-            user = userService.save(user);
-            dentist.setUser(user);
-        }
-        // Save the dentist
-        dentist = dentistService.save(dentist);
-
-        // Handle clinic assignments
-        if (primaryClinicId != null) {
-            dentistService.assignPrimaryClinic(dentist.getId(), primaryClinicId);
-        }
-
-        if (secondaryClinicIds != null && !secondaryClinicIds.isEmpty()) {
-            dentistService.assignSecondaryClinics(dentist.getId(), secondaryClinicIds);
-        }
-
-        // Set success message and redirect
-        String message = isNew ? "Dentist created successfully" : "Dentist updated successfully";
-        redirectAttributes.addFlashAttribute("successMessage", message);
-
-        return "redirect:/admin/dentists";
     }
 
     @GetMapping("/{id}")

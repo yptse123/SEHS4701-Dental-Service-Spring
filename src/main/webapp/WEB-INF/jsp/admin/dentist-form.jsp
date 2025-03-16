@@ -41,7 +41,6 @@
                     <form:form action="/admin/dentists" method="post" modelAttribute="dentist">
                         <form:hidden path="id" />
                         <form:hidden path="createdAt" />
-                        <input type="hidden" name="userId" value="${user.id}" />
 
                         <div class="form-section">
                             <div class="form-section-title">Personal Information</div>
