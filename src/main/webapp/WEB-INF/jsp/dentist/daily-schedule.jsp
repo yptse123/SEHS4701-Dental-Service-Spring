@@ -125,7 +125,7 @@
                                                 </div>
                                             </div>
                                             <div class="appointment-actions">
-                                                <a href="<c:url value='/admin/appointments/${appointment.id}'/>" class="action-btn">
+                                                <a href="<c:url value='/dentist/appointments/${appointment.id}'/>" class="action-btn">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
                                             </div>

@@ -128,8 +128,6 @@ public interface AppointmentService {
 
         Appointment findNextScheduledByPatient(Patient patient);
 
-        // Add these methods to the AppointmentService interface
-
         List<Appointment> findByDentistBetweenDates(Dentist dentist, LocalDate startDate, LocalDate endDate);
 
         List<Appointment> findByDentistBetweenDates(Dentist dentist, LocalDate startDate, LocalDate endDate, int limit);
@@ -155,4 +153,6 @@ public interface AppointmentService {
                         LocalDate startDate,
                         LocalDate endDate,
                         String patientName);
+
+        List<Appointment> findByPatientAndDentist(Patient patient, Dentist dentist);
 }

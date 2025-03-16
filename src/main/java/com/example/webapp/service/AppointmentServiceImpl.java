@@ -484,4 +484,9 @@ public class AppointmentServiceImpl implements AppointmentService {
     public List<Appointment> findByAppointmentDate(LocalDate date) {
         return appointmentRepository.findByAppointmentDate(date);
     }
+
+    @Override
+    public List<Appointment> findByPatientAndDentist(Patient patient, Dentist dentist) {
+        return appointmentRepository.findByPatientAndDentist(patient, dentist);
+    }
 }
