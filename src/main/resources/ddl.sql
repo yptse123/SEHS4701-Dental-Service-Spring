@@ -44,16 +44,19 @@ CREATE TABLE `dental`.`user_profiles` (
 );
 
 CREATE TABLE `dental`.`patients` (
-    `patient_id` BIGINT NOT NULL AUTO_INCREMENT,
-    `user_id` BIGINT NOT NULL,
-    `first_name` VARCHAR(50) NOT NULL,
-    `last_name` VARCHAR(50) NOT NULL,
-    `phone` VARCHAR(20) NOT NULL,
-    `address` VARCHAR(255),
-    `date_of_birth` DATE,
-    `gender` ENUM('MALE', 'FEMALE', 'OTHER'),
-    PRIMARY KEY (`patient_id`),
-    CONSTRAINT `fk_patient_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
+  `patient_id` BIGINT NOT NULL AUTO_INCREMENT,
+  `user_id` BIGINT NOT NULL,
+  `first_name` VARCHAR(50) NOT NULL,
+  `last_name` VARCHAR(50) NOT NULL,
+  `phone` VARCHAR(20) NOT NULL,
+  `address` VARCHAR(255),
+  `date_of_birth` DATE,
+  `gender` ENUM('MALE', 'FEMALE', 'OTHER'),
+  `is_active` BOOLEAN DEFAULT TRUE,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`patient_id`),
+  CONSTRAINT `fk_patient_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
 );
 
 CREATE TABLE `dental`.`clinics` (

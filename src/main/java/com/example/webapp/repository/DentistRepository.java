@@ -44,5 +44,5 @@ public interface DentistRepository extends JpaRepository<Dentist, Long> {
 
     // Find active dentists by clinic
     @Query("SELECT d FROM Dentist d JOIN d.clinicAssignments ca WHERE ca.clinic.id = :clinicId AND d.active = true")
-    List<Dentist> findActiveByClinicId(@Param("clinicId") Long clinicId);
+    List<Dentist> findActiveByClinicId(Long clinicId);
 }

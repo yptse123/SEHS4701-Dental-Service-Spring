@@ -21,12 +21,12 @@ public class Dentist {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @NotBlank
+    @NotBlank(message = "First name is required")
     @Size(max = 50)
     @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @NotBlank
+    @NotBlank(message = "Last name is required")
     @Size(max = 50)
     @Column(name = "last_name", nullable = false)
     private String lastName;
@@ -37,16 +37,16 @@ public class Dentist {
 
     @Column(name = "bio")
     private String bio;
-
+    
+    @Column(name = "is_active")
+    private boolean active = true;
+    
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
+    
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-    @Column(name = "is_active", nullable = false)
-    private boolean active = true;
-
+    
     @OneToMany(mappedBy = "dentist", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<DentistClinicAssignment> clinicAssignments = new HashSet<>();
 
@@ -111,6 +111,14 @@ public class Dentist {
     public void setBio(String bio) {
         this.bio = bio;
     }
+    
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
@@ -126,18 +134,6 @@ public class Dentist {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
-    public boolean getActive() {
-        return isActive();
     }
 
     public Set<DentistClinicAssignment> getClinicAssignments() {
@@ -156,15 +152,21 @@ public class Dentist {
     }
 
     public void removeClinicAssignment(Clinic clinic) {
-        clinicAssignments.removeIf(assignment -> assignment.getClinic().equals(clinic));
-        clinic.getDentistAssignments().removeIf(assignment -> assignment.getDentist().equals(this));
+        for (DentistClinicAssignment assignment : new HashSet<>(clinicAssignments)) {
+            if (assignment.getClinic().equals(clinic)) {
+                clinicAssignments.remove(assignment);
+                clinic.getDentistAssignments().remove(assignment);
+                assignment.setDentist(null);
+                assignment.setClinic(null);
+            }
+        }
     }
 
     // Utility methods
     public String getFullName() {
         return firstName + " " + lastName;
     }
-
+    
     // Method to get primary clinic
     public Clinic getPrimaryClinic() {
         return clinicAssignments.stream()
@@ -173,7 +175,7 @@ public class Dentist {
                 .findFirst()
                 .orElse(null);
     }
-
+    
     // Method to get all assigned clinics
     public Set<Clinic> getClinics() {
         Set<Clinic> clinics = new HashSet<>();

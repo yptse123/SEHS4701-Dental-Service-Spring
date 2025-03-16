@@ -7,9 +7,13 @@ INSERT INTO `dental`.`users` (`username`, `password`, `email`, `role`) VALUES
 ('drchen', '$2a$10$v06WAFp7ldRMTTVm59iDGeLqsIOAtFY.fD0IqPppEVSmTlW79b3P.', 'sarah.chen@hkdc.com', 'DENTIST');
 
 -- Sample patients
-INSERT INTO `dental`.`patients` (`user_id`, `first_name`, `last_name`, `phone`, `address`, `date_of_birth`, `gender`) VALUES
-(2, 'John', 'Doe', '98765432', '123 Main St, Hong Kong', '1985-05-15', 'MALE'),
-(3, 'Jane', 'Smith', '91234567', '456 Park Ave, Kowloon', '1990-10-20', 'FEMALE');
+-- Insert sample data into patients
+INSERT INTO `dental`.`patients` (`user_id`, `first_name`, `last_name`, `phone`, `address`, `date_of_birth`, `gender`, `is_active`)
+VALUES
+(2, 'John', 'Doe', '+852 9123 4567', '123 Main St, Central, Hong Kong', '1985-06-15', 'MALE', TRUE),
+(3, 'Jane', 'Smith', '+852 9876 5432', '456 Park Avenue, TST, Kowloon', '1990-03-22', 'FEMALE', TRUE),
+(4, 'David', 'Wong', '+852 6789 1234', '789 Garden Road, Sai Kung, New Territories', '1978-11-08', 'MALE', TRUE),
+(5, 'Emily', 'Chan', '+852 5432 1098', '101 Harbor View, Wan Chai, Hong Kong', '2000-09-14', 'FEMALE', TRUE);
 
 -- Updated Sample clinics with new schema
 INSERT INTO `dental`.`clinics` (`name`, `address`, `city`, `postal_code`, `phone`, `email`, `opening_time`, `closing_time`, `is_active`, `description`) VALUES

@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -50,7 +51,8 @@ public class SecurityConfig {
                                                 .key("uniqueAndSecretKey")
                                                 .tokenValiditySeconds(86400)
                                                 .userDetailsService(userDetailsService))
-                                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"));
+                                .csrf(csrf -> csrf
+                                                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));
 
                 return http.build();
         }
