@@ -49,7 +49,12 @@ INSERT INTO `dental`.`schedules` (`dentist_id`, `clinic_id`, `day_of_week`, `sta
 (2, 4, 'THURSDAY', '09:00:00', '15:00:00'),
 (2, 5, 'FRIDAY', '13:00:00', '18:00:00');
 
--- Sample appointments
-INSERT INTO `dental`.`appointments` (`patient_id`, `dentist_id`, `clinic_id`, `appointment_date`, `start_time`, `end_time`, `status`, `notes`) VALUES
-(1, 1, 1, CURDATE() + INTERVAL 7 DAY, '10:00:00', '11:00:00', 'SCHEDULED', 'Regular check-up'),
-(2, 2, 3, CURDATE() + INTERVAL 10 DAY, '14:00:00', '15:00:00', 'SCHEDULED', 'Orthodontic consultation');
+-- DML for appointments
+INSERT INTO `dental`.`appointments` 
+(`patient_id`, `dentist_id`, `clinic_id`, `appointment_date`, `start_time`, `end_time`, `status`, `notes`) 
+VALUES 
+(1, 1, 1, '2025-03-20', '10:00:00', '11:00:00', 'SCHEDULED', 'Regular checkup'),
+(2, 2, 1, '2025-03-21', '14:00:00', '15:30:00', 'SCHEDULED', 'Root canal treatment'),
+(1, 2, 2, '2025-03-22', '09:30:00', '10:30:00', 'SCHEDULED', 'Teeth whitening procedure'),
+(3, 2, 3, '2025-03-18', '16:00:00', '16:30:00', 'COMPLETED', 'Dental hygiene appointment'),
+(4, 1, 2, '2025-03-15', '11:00:00', '12:00:00', 'CANCELLED', 'Patient requested cancellation');

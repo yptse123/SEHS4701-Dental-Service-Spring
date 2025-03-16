@@ -346,14 +346,14 @@
                                         <div class="action-card">
                                             <i class="fas fa-user-plus"></i>
                                             <h3>Add Dentist</h3>
-                                            <a href="<c:url value='/admin/dentists/add'/>" class="btn-primary">Add
+                                            <a href="<c:url value='/admin/dentists/new'/>" class="btn-primary">Add
                                                 New</a>
                                         </div>
 
                                         <div class="action-card">
                                             <i class="fas fa-clinic-medical"></i>
                                             <h3>Add Clinic</h3>
-                                            <a href="<c:url value='/admin/clinics/add'/>" class="btn-primary">Add
+                                            <a href="<c:url value='/admin/clinics/new'/>" class="btn-primary">Add
                                                 New</a>
                                         </div>
 

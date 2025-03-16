@@ -1,0 +1,179 @@
+/* Filter panel improvements */
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 15px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.card-header h3 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.card-header h3 i {
+    margin-right: 8px;
+    color: #6c757d;
+}
+
+.toggle-filters {
+    padding: 0;
+    background: transparent;
+    border: none;
+    color: #6c757d;
+}
+
+.filter-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+}
+
+.filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    width: 100%;
+}
+
+.filter-col {
+    flex: 1;
+    min-width: 200px;
+}
+
+.form-group {
+    margin-bottom: 0;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #495057;
+    font-size: 0.9rem;
+}
+
+.form-group label i {
+    margin-right: 6px;
+    color: #6c757d;
+}
+
+.date-range-container {
+    flex: 1;
+}
+
+.date-range-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.date-range-label {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+}
+
+.date-inputs {
+    display: flex;
+    gap: 10px;
+}
+
+.date-input-group {
+    flex: 1;
+}
+
+.date-input-group label {
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-bottom: 3px;
+}
+
+.filter-actions {
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #e9ecef;
+}
+
+/* For mobile view */
+@media (max-width: 768px) {
+    .filter-col {
+        flex: 0 0 100%;
+    }
+    
+    .date-inputs {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+/* Date inputs horizontal alignment styling */
+.date-inputs-container {
+    display: flex;
+    width: 100%;
+}
+
+.date-input-pair {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 8px;
+}
+
+.date-input-pair input[type="date"] {
+    flex: 1;
+    min-width: 0; /* Allows flex items to shrink below content size */
+}
+
+.date-separator {
+    color: #6c757d;
+    font-size: 0.85rem;
+    padding: 0 4px;
+}
+
+/* Make date inputs same height as select inputs */
+.form-control {
+    height: 38px;
+    padding: 0.375rem 0.75rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .date-input-pair {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    
+    .date-separator {
+        display: none;
+    }
+}
+
+/* Add "From" and "To" pseudo-elements for small screens */
+@media (max-width: 768px) {
+    .date-input-pair input[type="date"]:first-child::before {
+        content: "From: ";
+        color: #6c757d;
+        margin-right: 5px;
+    }
+    
+    .date-input-pair input[type="date"]:last-child::before {
+        content: "To: ";
+        color: #6c757d;
+        margin-right: 5px;
+    }
+}
