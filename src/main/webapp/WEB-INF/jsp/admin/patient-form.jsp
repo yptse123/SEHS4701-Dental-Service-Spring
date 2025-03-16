@@ -130,13 +130,13 @@
 
                                 <div class="form-group">
                                     <label>Username</label>
-                                    <input type="text" class="form-control" value="${user.username}" readonly />
+                                    <input type="text" class="form-control" value="${patientUser.username}" readonly />
                                     <small class="text-muted">Username cannot be changed.</small>
                                 </div>
 
                                 <div class="form-group">
                                     <label>Email</label>
-                                    <input type="text" class="form-control" value="${patient.user.email}" readonly />
+                                    <input type="text" class="form-control" value="${patientUser.email}" readonly />
                                 </div>
                             </div>
                         </c:if>

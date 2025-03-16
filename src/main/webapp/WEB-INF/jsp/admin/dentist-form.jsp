@@ -101,13 +101,13 @@
 
                                 <div class="form-group">
                                     <label>Username</label>
-                                    <input type="text" class="form-control" value="${user.username}" readonly />
+                                    <input type="text" class="form-control" value="${dentistUser.username}" readonly />
                                     <small class="text-muted">Username cannot be changed.</small>
                                 </div>
 
                                 <div class="form-group">
-                                    <form:label path="user.email">Email</form:label>
-                                    <form:input path="user.email" class="form-control" type="email" readonly="true" />
+                                    <label>Email</label>
+                                    <input type="text" class="form-control" value="${dentistUser.email}" readonly />
                                 </div>
                                 
                                 <div class="form-check">

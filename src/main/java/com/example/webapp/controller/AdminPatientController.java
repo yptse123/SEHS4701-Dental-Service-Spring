@@ -161,7 +161,9 @@ public class AdminPatientController {
         if (patientOpt.isPresent()) {
             Patient patient = patientOpt.get();
             model.addAttribute("patient", patient);
-            model.addAttribute("user", patient.getUser());
+
+            // Change this line - use a different attribute name
+            model.addAttribute("patientUser", patient.getUser());
 
             return "admin/patient-form";
         } else {
