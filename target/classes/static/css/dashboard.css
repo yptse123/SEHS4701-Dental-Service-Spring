@@ -902,3 +902,190 @@ body {
 .mb-4 {
     margin-bottom: 1.5rem !important;
 }
+
+/* Weekly Schedule Styles */
+.weekly-schedule {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 15px;
+    gap: 15px;
+    margin: 0 -5px;  /* Compensate for the padding on schedule-day */
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e0 #f8f9fa;
+}
+
+.weekly-schedule::-webkit-scrollbar {
+    height: 6px;
+}
+
+.weekly-schedule::-webkit-scrollbar-track {
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+.weekly-schedule::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 10px;
+}
+
+.schedule-day {
+    min-width: 200px;
+    flex: 1;
+    max-width: 250px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.schedule-day.today {
+    background-color: #e8f4f8;
+    border-left: 4px solid #0d6efd;
+}
+
+.day-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.schedule-day h3 {
+    margin: 0;
+    font-size: 1rem;
+    color: #343a40;
+    font-weight: 600;
+}
+
+.day-date {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.day-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+.schedule-slot {
+    background-color: #fff;
+    border-radius: 6px;
+    padding: 10px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    border-left: 3px solid #4dabf7;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.schedule-slot:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.schedule-slot .time {
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9rem;
+    color: #495057;
+    margin-bottom: 5px;
+}
+
+.schedule-slot .time i {
+    color: #6c757d;
+    font-size: 0.8rem;
+}
+
+.schedule-slot .patient {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9rem;
+    color: #212529;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.schedule-slot .patient i {
+    color: #6c757d;
+    font-size: 0.8rem;
+}
+
+.schedule-slot .clinic {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-bottom: 5px;
+}
+
+.schedule-slot .clinic i {
+    font-size: 0.8rem;
+}
+
+.schedule-slot .status {
+    display: inline-block;
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+    text-transform: capitalize;
+    margin-top: 5px;
+}
+
+.schedule-slot .status-scheduled {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+.schedule-slot .status-completed {
+    background-color: #e8f5e9;
+    color: #388e3c;
+}
+
+.schedule-slot .status-cancelled {
+    background-color: #ffebee;
+    color: #d32f2f;
+}
+
+.schedule-slot .status-no_show {
+    background-color: #fff8e1;
+    color: #f57f17;
+}
+
+.no-schedule {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 0;
+    color: #adb5bd;
+    text-align: center;
+}
+
+.no-schedule i {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+}
+
+.no-schedule p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* For mobile responsive */
+@media (max-width: 768px) {
+    .schedule-day {
+        min-width: 180px;
+        padding: 10px;
+    }
+}
