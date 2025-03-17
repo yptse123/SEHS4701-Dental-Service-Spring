@@ -91,9 +91,9 @@
                                             <tbody>
                                                 <c:forEach items="${upcomingAppointments}" var="appointment">
                                                     <tr>
-                                                        <td>${appointment.appointmentDate}</td>
-                                                        <td>${appointment.startTime} -
-                                                            ${appointment.endTime}</td>
+                                                        <td>${DateTimeUtils.formatDate(appointment.appointmentDate)}</td>
+                                                        <td>${DateTimeUtils.formatTime(appointment.startTime)} -
+                                                            ${DateTimeUtils.formatTime(appointment.endTime)}</td>
                                                         <td>Dr. ${appointment.dentist.firstName}
                                                             ${appointment.dentist.lastName}</td>
                                                         <td>${appointment.clinic.name}</td>
@@ -121,24 +121,6 @@
                                         </div>
                                     </c:otherwise>
                                 </c:choose>
-                            </div>
-                        </section>
-
-                        <section class="dashboard-section">
-                            <div class="section-header">
-                                <h2>Clinics</h2>
-                            </div>
-
-                            <div class="section-content clinics-grid">
-                                <c:forEach items="${clinics}" var="clinic">
-                                    <div class="clinic-card">
-                                        <h3>${clinic.name}</h3>
-                                        <p><i class="fas fa-map-marker-alt"></i> ${clinic.address}</p>
-                                        <p><i class="fas fa-phone"></i> ${clinic.phone}</p>
-                                        <p><i class="fas fa-clock"></i> ${clinic.openTime} -
-                                            ${clinic.closeTime}</p>
-                                    </div>
-                                </c:forEach>
                             </div>
                         </section>
                     </div>
