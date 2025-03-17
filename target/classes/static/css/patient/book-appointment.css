@@ -1,0 +1,467 @@
+/* === Appointment List Page === */
+.appointments-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 0;
+}
+
+.appointments-table th, 
+.appointments-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.appointments-table th {
+    font-weight: 600;
+    color: #495057;
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.appointments-table tr:last-child td {
+    border-bottom: none;
+}
+
+.appointments-table tr:hover {
+    background-color: #f8f9fa;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.status-badge.small {
+    padding: 3px 6px;
+    font-size: 0.75rem;
+}
+
+.status-scheduled {
+    background-color: #e3f2fd;
+    color: #0d47a1;
+}
+
+.status-completed {
+    background-color: #e8f5e9;
+    color: #1b5e20;
+}
+
+.status-cancelled {
+    background-color: #ffebee;
+    color: #b71c1c;
+}
+
+.status-no_show {
+    background-color: #fafafa;
+    color: #616161;
+}
+
+.btn-view, .btn-cancel {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.btn-view {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+.btn-view:hover {
+    background-color: #bbdefb;
+}
+
+.btn-cancel {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+.btn-cancel:hover {
+    background-color: #ffcdd2;
+}
+
+.actions {
+    white-space: nowrap;
+    display: flex;
+    gap: 5px;
+}
+
+/* Empty state styling */
+.empty-state {
+    padding: 30px 0;
+    text-align: center;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: #adb5bd;
+}
+
+.empty-state p {
+    font-size: 1rem;
+    margin-bottom: 20px;
+}
+
+/* === Booking Process Styles === */
+.booking-steps {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 30px 0;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 120px;
+}
+
+.step-number {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: #f8f9fa;
+    border: 2px solid #ced4da;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    margin-bottom: 8px;
+    transition: all 0.3s;
+}
+
+.step-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.step-connector {
+    flex-grow: 1;
+    height: 2px;
+    background-color: #ced4da;
+    margin: 0 10px;
+    position: relative;
+    top: -14px;
+    max-width: 100px;
+    transition: all 0.3s;
+}
+
+.step.active .step-number {
+    background-color: #e3f2fd;
+    border-color: #1976d2;
+    color: #1976d2;
+}
+
+.step.active .step-label {
+    color: #1976d2;
+    font-weight: 500;
+}
+
+.step.completed .step-number {
+    background-color: #1976d2;
+    border-color: #1976d2;
+    color: white;
+}
+
+.step.completed .step-label {
+    color: #1976d2;
+}
+
+.step-connector.completed {
+    background-color: #1976d2;
+}
+
+/* Date input container */
+.date-input-container {
+    position: relative;
+}
+
+.date-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    pointer-events: none;
+}
+
+/* Form styles */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #495057;
+}
+
+.form-control {
+    display: block;
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus {
+    color: #495057;
+    background-color: #fff;
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.form-text {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+}
+
+/* Clinics table */
+.clinics-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.clinics-table th,
+.clinics-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.clinics-table th {
+    font-weight: 600;
+    color: #495057;
+    background-color: #f8f9fa;
+}
+
+.clinics-table tr:hover {
+    background-color: #f8f9fa;
+    cursor: pointer;
+}
+
+.clinics-table tr.selected-clinic {
+    background-color: #e3f2fd;
+}
+
+.clinic-name {
+    font-weight: 500;
+    color: #212529;
+}
+
+/* Selected info */
+.selected-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.info-row {
+    display: flex;
+    align-items: flex-start;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.info-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.info-label {
+    width: 100px;
+    font-weight: 500;
+    color: #495057;
+}
+
+.info-value {
+    flex: 1;
+}
+
+/* Time slots */
+.time-slots-container {
+    margin-top: 10px;
+}
+
+.time-slots {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 10px;
+}
+
+.time-slot {
+    position: relative;
+}
+
+.time-slot input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.time-slot label {
+    display: block;
+    padding: 12px 10px;
+    text-align: center;
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    margin: 0;
+}
+
+.time-slot input[type="radio"]:checked + label {
+    background-color: #e3f2fd;
+    border-color: #1976d2;
+    color: #1976d2;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-weight: 500;
+}
+
+.time-slot label:hover {
+    background-color: #e9ecef;
+}
+
+.time-slot input[type="radio"]:focus + label {
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.no-slots-message {
+    padding: 20px;
+    text-align: center;
+    background-color: #fff8e1;
+    border-radius: 4px;
+    color: #856404;
+}
+
+.no-slots-message i {
+    font-size: 2rem;
+    margin-bottom: 15px;
+    color: #ffc107;
+}
+
+.no-slots-message p {
+    margin-bottom: 15px;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .booking-steps {
+        flex-wrap: wrap;
+        justify-content: space-around;
+    }
+    
+    .step-connector {
+        width: 30px;
+        min-width: 30px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .form-actions button,
+    .form-actions a {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .time-slots {
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    }
+    
+    .info-row {
+        flex-direction: column;
+    }
+    
+    .info-label {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+    
+    .table-responsive {
+        overflow-x: auto;
+    }
+}
+
+/* Alert styles */
+.alert {
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+}
+
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+.alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+
+.alert i {
+    font-size: 1.25rem;
+}
+
+.close-alert {
+    position: absolute;
+    top: 12px;
+    right: 15px;
+    background: transparent;
+    border: none;
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+    color: inherit;
+    opacity: 0.7;
+    padding: 0;
+}
+
+.close-alert:hover {
+    opacity: 1;
+}

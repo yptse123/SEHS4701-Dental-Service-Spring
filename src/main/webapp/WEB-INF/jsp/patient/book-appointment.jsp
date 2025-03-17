@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="<c:url value='/css/dashboard.css'/>">
     <link rel="stylesheet" href="<c:url value='/css/appointments.css'/>">
+    <link rel="stylesheet" href="<c:url value='/css/patient/book-appointment.css'/>">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
 <body>

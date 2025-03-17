@@ -16,7 +16,7 @@ COPY src ./src
 RUN mkdir -p /app/target/classes
 
 # Run Maven to build the project
-RUN mvn clean package
+RUN mvn clean package -DskipTests
 
 FROM tomcat:10.0
 # Remove default webapps

@@ -96,21 +96,103 @@
                             <div class="time-slots-container">
                                 <c:choose>
                                     <c:when test="${not empty availableSlots}">
-                                        <div class="time-slots">
-                                            <c:forEach items="${availableSlots}" var="slot" varStatus="status">
-                                                <div class="time-slot">
-                                                    <input type="radio" name="timeSlot" id="slot${status.index}" 
-                                                           value="${slot[0]}|${slot[1]}" required
-                                                           data-start="${slot[0]}" data-end="${slot[1]}">
-                                                    <label for="slot${status.index}">
-                                                        <fmt:parseDate value="${slot[0]}" pattern="HH:mm" var="parsedStartTime" type="time" />
-                                                        <fmt:formatDate value="${parsedStartTime}" pattern="h:mm a" /> - 
-                                                        <fmt:parseDate value="${slot[1]}" pattern="HH:mm" var="parsedEndTime" type="time" />
-                                                        <fmt:formatDate value="${parsedEndTime}" pattern="h:mm a" />
-                                                    </label>
+                                        <!-- Organize time slots by period (morning, afternoon, evening) -->
+                                        <c:set var="morningSlots" value="${availableSlots.stream().filter(slot -> slot[0] < '12:00').toList()}" />
+                                        <c:set var="afternoonSlots" value="${availableSlots.stream().filter(slot -> slot[0] >= '12:00' && slot[0] < '17:00').toList()}" />
+                                        <c:set var="eveningSlots" value="${availableSlots.stream().filter(slot -> slot[0] >= '17:00').toList()}" />
+                                        
+                                        <!-- Morning Section -->
+                                        <c:if test="${not empty morningSlots}">
+                                            <div class="time-period morning">
+                                                <div class="time-period-header">
+                                                    <div class="time-period-icon">
+                                                        <i class="fas fa-sun"></i>
+                                                    </div>
+                                                    <h4>Morning</h4>
                                                 </div>
-                                            </c:forEach>
-                                        </div>
+                                                <div class="time-slots-grid">
+                                                    <c:forEach items="${morningSlots}" var="slot" varStatus="status">
+                                                        <div class="time-slot morning">
+                                                            <input type="radio" name="timeSlot" id="slot-morning-${status.index}" 
+                                                                   value="${slot[0]}|${slot[1]}" required
+                                                                   data-start="${slot[0]}" data-end="${slot[1]}">
+                                                            <label for="slot-morning-${status.index}">
+                                                                <fmt:parseDate value="${slot[0]}" pattern="HH:mm" var="parsedStartTime" type="time" />
+                                                                <fmt:formatDate value="${parsedStartTime}" pattern="h:mm a" /> - 
+                                                                <fmt:parseDate value="${slot[1]}" pattern="HH:mm" var="parsedEndTime" type="time" />
+                                                                <fmt:formatDate value="${parsedEndTime}" pattern="h:mm a" />
+                                                            </label>
+                                                        </div>
+                                                    </c:forEach>
+                                                </div>
+                                            </div>
+                                        </c:if>
+                                        
+                                        <!-- Afternoon Section -->
+                                        <c:if test="${not empty afternoonSlots}">
+                                            <div class="time-period afternoon">
+                                                <div class="time-period-header">
+                                                    <div class="time-period-icon">
+                                                        <i class="fas fa-cloud-sun"></i>
+                                                    </div>
+                                                    <h4>Afternoon</h4>
+                                                </div>
+                                                <div class="time-slots-grid">
+                                                    <c:forEach items="${afternoonSlots}" var="slot" varStatus="status">
+                                                        <div class="time-slot afternoon">
+                                                            <input type="radio" name="timeSlot" id="slot-afternoon-${status.index}" 
+                                                                   value="${slot[0]}|${slot[1]}" required
+                                                                   data-start="${slot[0]}" data-end="${slot[1]}">
+                                                            <label for="slot-afternoon-${status.index}">
+                                                                <fmt:parseDate value="${slot[0]}" pattern="HH:mm" var="parsedStartTime" type="time" />
+                                                                <fmt:formatDate value="${parsedStartTime}" pattern="h:mm a" /> - 
+                                                                <fmt:parseDate value="${slot[1]}" pattern="HH:mm" var="parsedEndTime" type="time" />
+                                                                <fmt:formatDate value="${parsedEndTime}" pattern="h:mm a" />
+                                                            </label>
+                                                        </div>
+                                                    </c:forEach>
+                                                </div>
+                                            </div>
+                                        </c:if>
+                                        
+                                        <!-- Evening Section -->
+                                        <c:if test="${not empty eveningSlots}">
+                                            <div class="time-period evening">
+                                                <div class="time-period-header">
+                                                    <div class="time-period-icon">
+                                                        <i class="fas fa-moon"></i>
+                                                    </div>
+                                                    <h4>Evening</h4>
+                                                </div>
+                                                <div class="time-slots-grid">
+                                                    <c:forEach items="${eveningSlots}" var="slot" varStatus="status">
+                                                        <div class="time-slot evening">
+                                                            <input type="radio" name="timeSlot" id="slot-evening-${status.index}" 
+                                                                   value="${slot[0]}|${slot[1]}" required
+                                                                   data-start="${slot[0]}" data-end="${slot[1]}">
+                                                            <label for="slot-evening-${status.index}">
+                                                                <fmt:parseDate value="${slot[0]}" pattern="HH:mm" var="parsedStartTime" type="time" />
+                                                                <fmt:formatDate value="${parsedStartTime}" pattern="h:mm a" /> - 
+                                                                <fmt:parseDate value="${slot[1]}" pattern="HH:mm" var="parsedEndTime" type="time" />
+                                                                <fmt:formatDate value="${parsedEndTime}" pattern="h:mm a" />
+                                                            </label>
+                                                        </div>
+                                                    </c:forEach>
+                                                </div>
+                                            </div>
+                                        </c:if>
+                                        
+                                        <!-- If no time slots in any period -->
+                                        <c:if test="${empty morningSlots && empty afternoonSlots && empty eveningSlots}">
+                                            <div class="empty-state">
+                                                <i class="fas fa-calendar-times"></i>
+                                                <p>No available time slots for the selected date.</p>
+                                                <button type="button" class="btn-outline" onclick="history.back()">
+                                                    Choose a Different Date
+                                                </button>
+                                            </div>
+                                        </c:if>
+                                        
                                     </c:when>
                                     <c:otherwise>
                                         <div class="empty-state">

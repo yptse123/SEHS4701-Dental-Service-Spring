@@ -1,37 +1,184 @@
-.booking-summary {
+/* Layout */
+.content-wrapper {
+    padding: 20px;
+}
+
+/* Booking Steps Indicator - consistent with first booking page */
+.booking-steps {
     display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    padding: 15px 20px;
+    justify-content: center;
+    align-items: center;
+    margin: 25px 0;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 140px;
+    position: relative;
+}
+
+.step-number {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
     background-color: #f8f9fa;
+    border: 2px solid #ced4da;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    margin-bottom: 8px;
+    transition: all 0.3s;
+    z-index: 2;
+}
+
+.step-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.step-connector {
+    flex-grow: 1;
+    height: 2px;
+    background-color: #ced4da;
+    margin: 0 5px;
+    position: relative;
+    top: -14px;
+    max-width: 100px;
+    transition: all 0.3s;
+}
+
+.step.active .step-number {
+    background-color: #e3f2fd;
+    border-color: #1976d2;
+    color: #1976d2;
+}
+
+.step.active .step-label {
+    color: #1976d2;
+    font-weight: 500;
+}
+
+.step.completed .step-number {
+    background-color: #1976d2;
+    border-color: #1976d2;
+    color: white;
+}
+
+.step.completed .step-label {
+    color: #1976d2;
+}
+
+.step-connector.completed {
+    background-color: #1976d2;
+}
+
+/* Booking Summary - Selected clinic and date */
+.booking-summary {
+    background-color: #f8f9fa;
+    padding: 15px;
     border-radius: 8px;
     margin-bottom: 20px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
 }
 
 .summary-item {
     display: flex;
     align-items: center;
-    gap: 10px;
+    min-width: 250px;
 }
 
 .summary-label {
-    font-weight: 600;
+    font-weight: 500;
     color: #495057;
+    margin-right: 8px;
+    white-space: nowrap;
 }
 
 .summary-value {
     color: #212529;
 }
 
+/* Time Slots Grid */
 .time-slots-container {
+    margin: 15px 0;
+    overflow-x: auto;
+}
+
+.time-period {
     margin-bottom: 20px;
+}
+
+.time-period-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.time-period-header h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #343a40;
+    font-weight: 600;
+}
+
+.time-period-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.morning .time-period-icon {
+    background-color: #e3f2fd;
+    color: #0d47a1;
+}
+
+.afternoon .time-period-icon {
+    background-color: #fff3e0;
+    color: #e65100;
+}
+
+.evening .time-period-icon {
+    background-color: #e8eaf6;
+    color: #3f51b5;
+}
+
+/* Time Slots Grid */
+.time-slots-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+@media (max-width: 768px) {
+    .time-slots-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .time-slots-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 .time-slots {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 10px;
+    gap: 12px;
 }
 
 .time-slot {
@@ -47,32 +194,53 @@
 
 .time-slot label {
     display: block;
-    padding: 10px;
+    padding: 12px 8px;
     text-align: center;
     background-color: #f8f9fa;
     border: 1px solid #dee2e6;
     border-radius: 6px;
     cursor: pointer;
-    transition: all 0.2s;
     font-size: 0.9rem;
+    transition: all 0.2s;
+    margin: 0;
 }
 
 .time-slot input[type="radio"]:checked + label {
     background-color: #e3f2fd;
-    border-color: #4dabf7;
-    color: #0d6efd;
-    font-weight: 600;
-    box-shadow: 0 1px 4px rgba(13, 110, 253, 0.2);
+    border-color: #1976d2;
+    color: #1976d2;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-weight: 500;
 }
 
 .time-slot label:hover {
     background-color: #e9ecef;
+    border-color: #ced4da;
 }
 
+.time-slot input[type="radio"]:focus + label {
+    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.25);
+}
+
+/* Time slots color coding by period */
+.time-slot.morning label {
+    border-left: 3px solid #0d47a1;
+}
+
+.time-slot.afternoon label {
+    border-left: 3px solid #e65100;
+}
+
+.time-slot.evening label {
+    border-left: 3px solid #3f51b5;
+}
+
+/* Dentist Selection */
 .dentist-selection {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 15px;
+    margin-top: 10px;
 }
 
 .dentist-option {
@@ -89,8 +257,9 @@
 .dentist-option label {
     display: block;
     padding: 15px;
+    background-color: #f8f9fa;
     border: 1px solid #dee2e6;
-    border-radius: 8px;
+    border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s;
     height: 100%;
@@ -98,28 +267,75 @@
 
 .dentist-option input[type="radio"]:checked + label {
     background-color: #e3f2fd;
-    border-color: #4dabf7;
-    box-shadow: 0 2px 5px rgba(13, 110, 253, 0.2);
+    border-color: #1976d2;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dentist-option label:hover {
+    background-color: #e9ecef;
+    border-color: #ced4da;
+}
+
+.dentist-option input[type="radio"]:focus + label {
+    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.25);
 }
 
 .dentist-name {
-    font-weight: 600;
-    font-size: 1rem;
+    font-weight: 500;
     margin-bottom: 5px;
+    color: #212529;
 }
 
 .dentist-specialty {
+    font-size: 0.9rem;
     color: #6c757d;
-    font-size: 0.85rem;
 }
 
+/* Form Elements */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #495057;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    outline: 0;
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Checkbox Styling */
 .checkbox-container {
     display: block;
     position: relative;
     padding-left: 30px;
-    margin-bottom: 12px;
     cursor: pointer;
+    font-size: 0.95rem;
     user-select: none;
+    line-height: 1.5;
+    color: #495057;
 }
 
 .checkbox-container input {
@@ -136,18 +352,18 @@
     left: 0;
     height: 20px;
     width: 20px;
-    background-color: #f8f9fa;
+    background-color: #fff;
     border: 1px solid #ced4da;
     border-radius: 4px;
 }
 
 .checkbox-container:hover input ~ .checkmark {
-    background-color: #e9ecef;
+    background-color: #f8f9fa;
 }
 
 .checkbox-container input:checked ~ .checkmark {
-    background-color: #0d6efd;
-    border-color: #0d6efd;
+    background-color: #1976d2;
+    border-color: #1976d2;
 }
 
 .checkmark:after {
@@ -170,12 +386,160 @@
     transform: rotate(45deg);
 }
 
+/* Form Actions */
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 25px;
+}
+
+/* Buttons - consistent styling with other pages */
+.btn-primary, .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    font-size: 1rem;
+}
+
+.btn-primary {
+    background-color: #1976d2;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: #1565c0;
+}
+
+.btn-outline {
+    background-color: transparent;
+    color: #495057;
+    border: 1px solid #ced4da;
+}
+
+.btn-outline:hover {
+    background-color: #f8f9fa;
+}
+
+/* Empty State Styling */
+.empty-state {
+    padding: 30px;
+    text-align: center;
+    color: #6c757d;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    color: #adb5bd;
+}
+
+.empty-state p {
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+/* Alert Styling */
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+.alert i {
+    font-size: 1.25rem;
+}
+
+.close-alert {
+    margin-left: auto;
+    background: transparent;
+    border: none;
+    font-size: 1.25rem;
+    line-height: 1;
+    color: inherit;
+    opacity: 0.5;
+    cursor: pointer;
+}
+
+/* Card Styling - matching other pages */
+.card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.card-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.card-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #343a40;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+/* Responsive Styles */
 @media (max-width: 768px) {
+    .booking-steps {
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+    
+    .step {
+        width: 110px;
+    }
+    
+    .step-connector {
+        width: 20px;
+        min-width: 20px;
+    }
+    
     .time-slots {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     }
     
     .dentist-selection {
         grid-template-columns: 1fr;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .form-actions button {
+        width: 100%;
+    }
+    
+    .summary-item {
+        min-width: 100%;
     }
 }
