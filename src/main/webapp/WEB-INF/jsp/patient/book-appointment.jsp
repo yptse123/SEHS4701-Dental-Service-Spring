@@ -142,7 +142,6 @@
 
     <!-- JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="<c:url value='/js/common/sidebar.js'/>"></script>
     <script src="<c:url value='/js/patient/book-appointment.js'/>"></script>
 </body>
 </html>

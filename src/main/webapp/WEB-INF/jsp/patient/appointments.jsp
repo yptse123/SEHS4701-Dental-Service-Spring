@@ -189,7 +189,6 @@
     </div>
 
     <!-- JavaScript -->
-    <script src="<c:url value='/js/common/sidebar.js'/>"></script>
     <script src="<c:url value='/js/patient/appointments.js'/>"></script>
 </body>
 </html>

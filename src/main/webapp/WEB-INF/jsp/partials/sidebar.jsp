@@ -41,7 +41,7 @@
                     <!-- Patient-specific links -->
                     <sec:authorize access="hasRole('PATIENT')">
                         <li><a href="<c:url value='/patient/appointments'/>" data-title="My Appointments"><i
-                                    class="fas fa-calendar-check"></i> My Appointments</a></li>
+                                    class="fas fa-calendar-check"></i> <span>My Appointments</span></a></li>
                         <li><a href="<c:url value='/patient/book'/>" data-title="Book Appointment"><i
                                     class="fas fa-calendar-plus"></i>
                                 <span>Book Appointment</span></a></li>

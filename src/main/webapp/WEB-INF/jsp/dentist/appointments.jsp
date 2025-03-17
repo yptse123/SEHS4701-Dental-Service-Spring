@@ -224,7 +224,6 @@
     </div>
     
     <!-- JavaScript Imports -->
-    <script src="<c:url value='/js/common/sidebar.js'/>"></script>
     <script src="<c:url value='/js/dentist/appointments.js'/>"></script>
 </body>
 </html>

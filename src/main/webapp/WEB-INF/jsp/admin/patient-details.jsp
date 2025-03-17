@@ -244,8 +244,5 @@
             </div>
         </main>
     </div>
-    
-    <!-- JavaScript Imports -->
-    <script src="<c:url value='/js/common/sidebar.js'/>"></script>
 </body>
 </html>

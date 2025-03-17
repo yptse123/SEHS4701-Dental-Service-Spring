@@ -346,7 +346,6 @@
     </div>
 
     <!-- JavaScript -->
-    <script src="<c:url value='/js/common/sidebar.js'/>"></script>
     <script src="<c:url value='/js/patient/book-appointment-time.js'/>"></script>
 </body>
 </html>
