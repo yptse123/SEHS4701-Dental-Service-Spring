@@ -141,17 +141,27 @@ public class DashboardController {
         } else if (role.equals("ROLE_PATIENT")) {
             // Patient-specific dashboard data
             Patient patient = patientService.findByUser(user)
-                    .orElseThrow(() -> new RuntimeException("Patient profile not found"));
-
+                .orElseThrow(() -> new RuntimeException("Patient profile not found"));
+            
+            // Count upcoming appointments (future appointments with SCHEDULED status)
+            int upcomingCount = appointmentService.countByPatientAndStatusAndDateAfter(
+                patient, Appointment.Status.SCHEDULED, today);
+            model.addAttribute("upcomingAppointmentsCount", upcomingCount);
+            
+            // Count past appointments (appointments before today or with COMPLETED status)
+            int pastCount = appointmentService.countByPatientAndDateBeforeOrStatus(
+                patient, today, Appointment.Status.COMPLETED);
+            model.addAttribute("pastAppointmentsCount", pastCount);
+            
             // Get patient's upcoming appointments
-            List<Appointment> patientAppointments = appointmentService.findByPatient(
-                    patient, 5);
-            model.addAttribute("patientAppointments", patientAppointments);
-
+            List<Appointment> upcomingAppointments = appointmentService.findUpcomingByPatient(
+                patient, today, 5);
+            model.addAttribute("upcomingAppointments", upcomingAppointments);
+            
             // Get last visit date
             Appointment lastVisit = appointmentService.findLastCompletedByPatient(patient);
             model.addAttribute("lastVisit", lastVisit);
-
+            
             // Get next scheduled appointment
             Appointment nextAppointment = appointmentService.findNextScheduledByPatient(patient);
             model.addAttribute("nextAppointment", nextAppointment);

@@ -155,4 +155,36 @@ public interface AppointmentService {
                         String patientName);
 
         List<Appointment> findByPatientAndDentist(Patient patient, Dentist dentist);
+
+        /**
+         * Count the number of upcoming appointments for a patient with a specific
+         * status after a date
+         * 
+         * @param patient The patient
+         * @param status  The appointment status
+         * @param date    The date after which to count appointments
+         * @return count of upcoming appointments
+         */
+        int countByPatientAndStatusAndDateAfter(Patient patient, Appointment.Status status, LocalDate date);
+
+        /**
+         * Count the number of past appointments for a patient (before a date or with a
+         * specific status)
+         * 
+         * @param patient The patient
+         * @param date    The date before which to count appointments
+         * @param status  The appointment status to include regardless of date
+         * @return count of past appointments
+         */
+        int countByPatientAndDateBeforeOrStatus(Patient patient, LocalDate date, Appointment.Status status);
+
+        /**
+         * Find upcoming appointments for a patient
+         * 
+         * @param patient The patient
+         * @param date    The starting date (today or future)
+         * @param limit   Maximum number of appointments to return
+         * @return List of upcoming appointments
+         */
+        List<Appointment> findUpcomingByPatient(Patient patient, LocalDate date, int limit);
 }

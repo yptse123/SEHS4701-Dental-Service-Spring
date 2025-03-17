@@ -120,4 +120,10 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long>,
         List<Appointment> findByAppointmentDate(LocalDate date);
 
         List<Appointment> findByPatientAndDentist(Patient patient, Dentist dentist);
+
+        int countByPatientAndStatusAndAppointmentDateGreaterThanEqual(Patient patient, Appointment.Status status,
+                        LocalDate date);
+
+        int countByPatientAndAppointmentDateLessThanOrStatus(Patient patient, LocalDate date,
+                        Appointment.Status status);
 }

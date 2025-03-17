@@ -489,4 +489,22 @@ public class AppointmentServiceImpl implements AppointmentService {
     public List<Appointment> findByPatientAndDentist(Patient patient, Dentist dentist) {
         return appointmentRepository.findByPatientAndDentist(patient, dentist);
     }
+
+    @Override
+    public int countByPatientAndStatusAndDateAfter(Patient patient, Appointment.Status status, LocalDate date) {
+        return appointmentRepository.countByPatientAndStatusAndAppointmentDateGreaterThanEqual(patient, status, date);
+    }
+
+    @Override
+    public int countByPatientAndDateBeforeOrStatus(Patient patient, LocalDate date, Appointment.Status status) {
+        return appointmentRepository.countByPatientAndAppointmentDateLessThanOrStatus(patient, date, status);
+    }
+
+    @Override
+    public List<Appointment> findUpcomingByPatient(Patient patient, LocalDate date, int limit) {
+        Pageable pageable = PageRequest.of(0, limit, Sort.by("appointmentDate").ascending()
+                .and(Sort.by("startTime").ascending()));
+        return appointmentRepository.findByPatientAndStatusAndAppointmentDateGreaterThanEqual(
+                patient, Appointment.Status.SCHEDULED, date, pageable);
+    }
 }
