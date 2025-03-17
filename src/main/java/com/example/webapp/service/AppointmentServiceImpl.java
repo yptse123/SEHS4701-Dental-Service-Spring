@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -506,5 +507,94 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .and(Sort.by("startTime").ascending()));
         return appointmentRepository.findByPatientAndStatusAndAppointmentDateGreaterThanEqual(
                 patient, Appointment.Status.SCHEDULED, date, pageable);
+    }
+
+    @Override
+    public boolean checkForConflicts(Dentist dentist, LocalDate date, LocalTime startTime, LocalTime endTime) {
+        // Find all non-cancelled appointments for this dentist on this date
+        List<Appointment> existingAppointments = appointmentRepository.findByDentistAndAppointmentDateAndStatusNot(
+                dentist, date, Appointment.Status.CANCELLED);
+
+        return hasConflict(dentist, date, startTime, endTime, existingAppointments);
+    }
+
+    // Helper method to check for conflicts
+    private boolean hasConflict(Dentist dentist, LocalDate date, LocalTime startTime, LocalTime endTime,
+            List<Appointment> existingAppointments) {
+        for (Appointment existing : existingAppointments) {
+            // Skip if not for the same dentist
+            if (!existing.getDentist().getId().equals(dentist.getId())) {
+                continue;
+            }
+
+            // Check if the time periods overlap
+            if ((startTime.isBefore(existing.getEndTime()) || startTime.equals(existing.getEndTime())) &&
+                    (endTime.isAfter(existing.getStartTime()) || endTime.equals(existing.getStartTime()))) {
+                return true; // Conflict found
+            }
+        }
+
+        return false; // No conflict
+    }
+
+    @Override
+    public List<Appointment> findPastByPatient(Patient patient, LocalDate today, int limit) {
+        Pageable pageable = PageRequest.of(0, limit, Sort.by("appointmentDate").descending()
+                .and(Sort.by("startTime").descending()));
+
+        // Get past appointments (before today OR with COMPLETED/CANCELLED status)
+        return appointmentRepository.findByPatientAndAppointmentDateBeforeOrPatientAndStatusIn(
+                patient, today, patient,
+                List.of(Appointment.Status.COMPLETED, Appointment.Status.CANCELLED, Appointment.Status.NO_SHOW),
+                pageable);
+    }
+
+    @Override
+    public List<Object[]> findAvailableTimeSlots(Clinic clinic, LocalDate date) {
+        // Define clinic operating hours (modify these according to your business rules)
+        LocalTime startOfDay = LocalTime.of(9, 0); // 9:00 AM
+        LocalTime endOfDay = LocalTime.of(17, 0); // 5:00 PM
+        int slotDurationMinutes = 30; // 30-minute slots
+
+        // Get all dentists for this clinic
+        List<Dentist> clinicDentists = dentistRepository.findByClinic(clinic);
+        if (clinicDentists.isEmpty()) {
+            return List.of(); // No dentists available at this clinic
+        }
+
+        // Get all booked appointments for this date and clinic
+        List<Appointment> bookedAppointments = appointmentRepository
+                .findByClinicAndAppointmentDateAndStatusNot(
+                        clinic, date, Appointment.Status.CANCELLED);
+
+        // Generate all possible time slots
+        List<Object[]> availableSlots = new ArrayList<>();
+
+        LocalTime currentTime = startOfDay;
+        while (currentTime.plusMinutes(slotDurationMinutes).compareTo(endOfDay) <= 0) {
+            LocalTime slotStart = currentTime;
+            LocalTime slotEnd = currentTime.plusMinutes(slotDurationMinutes);
+
+            // Check if this slot is available for at least one dentist
+            boolean isAvailable = false;
+            for (Dentist dentist : clinicDentists) {
+                if (!hasConflict(dentist, date, slotStart, slotEnd, bookedAppointments)) {
+                    isAvailable = true;
+                    break;
+                }
+            }
+
+            if (isAvailable) {
+                availableSlots.add(new Object[] {
+                        slotStart.toString(),
+                        slotEnd.toString()
+                });
+            }
+
+            // Move to next slot
+            currentTime = currentTime.plusMinutes(slotDurationMinutes);
+        }
+
+        return availableSlots;
     }
 }

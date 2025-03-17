@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -187,4 +188,34 @@ public interface AppointmentService {
          * @return List of upcoming appointments
          */
         List<Appointment> findUpcomingByPatient(Patient patient, LocalDate date, int limit);
+
+        /**
+         * Check if there's a scheduling conflict for the dentist at the specified time
+         * 
+         * @param dentist   The dentist to check for conflicts
+         * @param date      The date of the appointment
+         * @param startTime The start time
+         * @param endTime   The end time
+         * @return true if there's a conflict, false otherwise
+         */
+        boolean checkForConflicts(Dentist dentist, LocalDate date, LocalTime startTime, LocalTime endTime);
+
+        /**
+         * Find past appointments for a patient
+         * 
+         * @param patient The patient
+         * @param today   Today's date
+         * @param limit   Maximum number of appointments to return
+         * @return List of past appointments
+         */
+        List<Appointment> findPastByPatient(Patient patient, LocalDate today, int limit);
+
+        /**
+         * Find available time slots for a clinic on a specific date
+         * 
+         * @param clinic The clinic
+         * @param date   The date to check
+         * @return List of available time slots as Object arrays [startTime, endTime]
+         */
+        List<Object[]> findAvailableTimeSlots(Clinic clinic, LocalDate date);
 }

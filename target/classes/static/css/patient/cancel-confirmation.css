@@ -1,0 +1,99 @@
+/* Additional styles for cancellation page */
+.cancellation-warning {
+    background-color: #fff8e1;
+    border-left: 4px solid #ffc107;
+    margin-bottom: 20px;
+}
+
+.cancellation-warning .card-body {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+}
+
+.warning-icon {
+    font-size: 2rem;
+    color: #ffc107;
+    flex-shrink: 0;
+    margin-top: 5px;
+}
+
+.warning-content h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #e65100;
+}
+
+.warning-content p {
+    margin-bottom: 10px;
+    color: #424242;
+}
+
+.warning-content ul {
+    margin-top: 0;
+    padding-left: 20px;
+}
+
+.warning-content li {
+    margin-bottom: 5px;
+    color: #455a64;
+}
+
+.appointment-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.summary-row {
+    display: flex;
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 12px;
+}
+
+.summary-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.summary-label {
+    width: 120px;
+    font-weight: 500;
+    color: #495057;
+}
+
+.summary-value {
+    flex: 1;
+    color: #212529;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .cancellation-warning .card-body {
+        flex-direction: column;
+    }
+    
+    .warning-icon {
+        margin-bottom: 10px;
+    }
+    
+    .summary-row {
+        flex-direction: column;
+    }
+    
+    .summary-label {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+}
