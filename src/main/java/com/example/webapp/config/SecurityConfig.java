@@ -52,7 +52,11 @@ public class SecurityConfig {
                                                 .tokenValiditySeconds(86400)
                                                 .userDetailsService(userDetailsService))
                                 .csrf(csrf -> csrf
-                                                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));
+                                                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+                                .headers(headers -> headers
+                                                .httpStrictTransportSecurity().disable())
+                                .requiresChannel(channel -> channel
+                                                .anyRequest().requiresInsecure());
 
                 return http.build();
         }
