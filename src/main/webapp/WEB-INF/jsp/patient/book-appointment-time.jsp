@@ -82,11 +82,40 @@
                     </div>
                 </div>
 
+                <div id="clinicDebugBanner" class="card" style="margin-bottom: 15px; background-color: #e8f5e9; border-left: 4px solid #2e7d32;">
+                    <div class="card-body" style="padding: 10px 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <h4 style="margin: 0; font-size: 1.1rem;">Appointment Information</h4>
+                            <button onclick="this.parentNode.parentNode.style.display='none'" 
+                                    style="background: none; border: none; cursor: pointer; font-size: 1.2rem;">&times;</button>
+                        </div>
+                        <p style="margin: 10px 0 5px;">
+                            <strong>Clinic:</strong> 
+                            <span id="clinicNameDisplay">${not empty appointment.clinic.name ? appointment.clinic.name : 'Not selected'}</span>
+                            <span id="clinicIdValue" style="margin-left: 10px; font-size: 0.8rem; color: #777;">(ID: ${not empty appointment.clinic.id ? appointment.clinic.id : param.clinicId})</span>
+                            <button onclick="recoverClinicId()" style="margin-left: 10px; padding: 2px 8px; background: #4caf50; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">Fix ID</button>
+                        </p>
+                        <p style="margin: 5px 0;">
+                            <strong>Date:</strong> 
+                            <span>${appointment.appointmentDate}</span>
+                        </p>
+                    </div>
+                </div>
+
                 <!-- Time Selection Card -->
                 <form action="<c:url value='/patient/book/confirm'/>" method="post" id="appointmentForm">
                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                    <input type="hidden" name="clinicId" value="${appointment.clinic.id}" />
+    
+                    <!-- Add a clinic ID input with a direct value (not nested property access) -->
+                    <c:set var="clinicIdValue" value="${not empty appointment.clinic.id ? appointment.clinic.id : param.clinicId}" />
+                    <input type="hidden" id="clinicIdField" name="clinicId" value="${clinicIdValue}" />
+                    
+                    <!-- Add direct appointment date value -->
                     <input type="hidden" name="appointmentDate" value="${appointment.appointmentDate}" />
+                    
+                    <!-- These will be populated by JavaScript -->
+                    <input type="hidden" name="startTime" value="" />
+                    <input type="hidden" name="endTime" value="" />
 
                     <div class="card">
                         <div class="card-header">
@@ -224,7 +253,6 @@
                                                            value="${dentist.id}" required>
                                                     <label for="dentist${dentist.id}">
                                                         <div class="dentist-name">Dr. ${dentist.firstName} ${dentist.lastName}</div>
-                                                        <div class="dentist-specialty">${dentist.specialty}</div>
                                                     </label>
                                                 </div>
                                             </c:forEach>
@@ -272,6 +300,46 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Debug information - only visible in development -->
+                    <div id="debugPanel" style="display: none; margin-top: 20px; padding: 15px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px;">
+                        <h5>Form Debug Information</h5>
+                        <p><strong>Clinic ID:</strong> <span id="debug-clinic-id">${clinicIdValue}</span></p>
+                        <p><strong>Date:</strong> <span id="debug-date">${appointment.appointmentDate}</span></p>
+                        <button type="button" class="btn-outline" onclick="showFormValues()">Show All Form Values</button>
+                        <div id="formValuesDisplay" style="margin-top: 10px;"></div>
+                    </div>
+
+                    <script>
+                        function showFormValues() {
+                            const form = document.getElementById('appointmentForm');
+                            const display = document.getElementById('formValuesDisplay');
+                            if (form && display) {
+                                const formData = new FormData(form);
+                                let html = '<ul style="list-style-type: none; padding-left: 0;">';
+                                
+                                for (const [name, value] of formData.entries()) {
+                                    html += `<li><strong>${name}:</strong> ${value}</li>`;
+                                }
+                                
+                                html += '</ul>';
+                                display.innerHTML = html;
+                            }
+                        }
+                        
+                        // Press Ctrl+D to show debug panel
+                        document.addEventListener('keydown', function(e) {
+                            if (e.ctrlKey && e.key === 'd') {
+                                e.preventDefault();
+                                const panel = document.getElementById('debugPanel');
+                                if (panel) {
+                                    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+                                    if (panel.style.display === 'block') {
+                                        showFormValues();
+                                    }
+                                }
+                            }
+                        });
+                    </script>
                 </form>
             </div>
         </main>

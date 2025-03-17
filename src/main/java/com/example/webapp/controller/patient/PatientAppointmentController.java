@@ -13,6 +13,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -164,35 +165,54 @@ public class PatientAppointmentController {
 
     // Process the appointment booking
     @PostMapping("/book/confirm")
-    public String confirmBooking(@ModelAttribute("appointment") @Valid Appointment appointment,
-            BindingResult bindingResult,
+    public String confirmBooking(
+            @RequestParam("clinicId") Long clinicId, // Add explicit clinicId parameter
+            @RequestParam("appointmentDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate appointmentDate, // Add
+                                                                                                                       // explicit
+                                                                                                                       // date
+                                                                                                                       // parameter
             @RequestParam("startTime") String startTime,
             @RequestParam("endTime") String endTime,
             @RequestParam("dentistId") Long dentistId,
+            @RequestParam(value = "notes", required = false) String notes,
             RedirectAttributes redirectAttributes,
             Model model) {
 
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("errorMessage", "Please check the appointment details and try again.");
-            return "patient/book-appointment-time";
-        }
-
         try {
-            // Set appointment details
-            Patient patient = getCurrentPatient();
-            Dentist dentist = dentistService.findById(dentistId)
-                    .orElseThrow(() -> new RuntimeException("Dentist not found"));
+            // Create a new appointment object instead of using ModelAttribute
+            Appointment appointment = new Appointment();
 
-            appointment.setPatient(patient);
-            appointment.setDentist(dentist);
+            // Set clinic
+            Clinic clinic = clinicService.findById(clinicId)
+                    .orElseThrow(() -> new RuntimeException("Clinic not found with ID: " + clinicId));
+            appointment.setClinic(clinic);
+
+            // Set appointment date and times
+            appointment.setAppointmentDate(appointmentDate);
             appointment.setStartTime(LocalTime.parse(startTime));
             appointment.setEndTime(LocalTime.parse(endTime));
+
+            // Set notes if provided
+            if (notes != null && !notes.trim().isEmpty()) {
+                appointment.setNotes(notes);
+            }
+
+            // Set patient (current user)
+            Patient patient = getCurrentPatient();
+            appointment.setPatient(patient);
+
+            // Set dentist
+            Dentist dentist = dentistService.findById(dentistId)
+                    .orElseThrow(() -> new RuntimeException("Dentist not found with ID: " + dentistId));
+            appointment.setDentist(dentist);
+
+            // Set status
             appointment.setStatus(Appointment.Status.SCHEDULED);
 
             // Check for conflicts before saving
             boolean hasConflict = appointmentService.checkForConflicts(
                     dentist,
-                    appointment.getAppointmentDate(),
+                    appointmentDate,
                     appointment.getStartTime(),
                     appointment.getEndTime());
 
@@ -200,17 +220,26 @@ public class PatientAppointmentController {
                 model.addAttribute("errorMessage",
                         "Sorry, this time slot is no longer available. Please select another time.");
 
-                // Reload necessary data
-                Clinic clinic = appointment.getClinic();
-                List<Object[]> availableSlots = appointmentService.findAvailableTimeSlots(clinic,
-                        appointment.getAppointmentDate());
-                model.addAttribute("availableSlots", availableSlots);
+                // Create appointment for form binding and set the clinic and date
+                Appointment formAppointment = new Appointment();
+                formAppointment.setClinic(clinic);
+                formAppointment.setAppointmentDate(appointmentDate);
+                model.addAttribute("appointment", formAppointment);
 
+                // Load available time slots and dentists
+                List<Object[]> availableSlots = appointmentService.findAvailableTimeSlots(clinic, appointmentDate);
                 List<Dentist> availableDentists = dentistService.findByClinic(clinic);
+
+                model.addAttribute("clinicIdValue", clinicId); // Explicitly add clinicId for the form
+                model.addAttribute("availableSlots", availableSlots);
                 model.addAttribute("dentists", availableDentists);
 
                 return "patient/book-appointment-time";
             }
+
+            // Add creation timestamps
+            appointment.setCreatedAt(LocalDateTime.now());
+            appointment.setUpdatedAt(LocalDateTime.now());
 
             // Save the appointment
             appointmentService.save(appointment);
@@ -219,12 +248,36 @@ public class PatientAppointmentController {
             redirectAttributes.addFlashAttribute("successMessage", "Your appointment has been booked successfully!");
             return "redirect:/patient/appointments";
         } catch (Exception e) {
+            // Log the exception for debugging
+            e.printStackTrace();
+
             // Handle errors
             model.addAttribute("errorMessage", "Failed to book appointment: " + e.getMessage());
 
-            // Reload necessary data
-            List<Clinic> clinics = clinicService.findAllActive();
-            model.addAttribute("clinics", clinics);
+            try {
+                // Recreate form state for redisplay
+                Clinic clinic = clinicService.findById(clinicId)
+                        .orElseThrow(() -> new RuntimeException("Clinic not found"));
+
+                // Create appointment for form binding
+                Appointment formAppointment = new Appointment();
+                formAppointment.setClinic(clinic);
+                formAppointment.setAppointmentDate(appointmentDate);
+                model.addAttribute("appointment", formAppointment);
+
+                // Reload necessary data
+                List<Object[]> availableSlots = appointmentService.findAvailableTimeSlots(clinic, appointmentDate);
+                List<Dentist> availableDentists = dentistService.findByClinic(clinic);
+
+                model.addAttribute("clinicIdValue", clinicId); // Explicitly add clinicId for the form
+                model.addAttribute("availableSlots", availableSlots);
+                model.addAttribute("dentists", availableDentists);
+            } catch (Exception ex) {
+                // If we can't recover the state, redirect to start booking process again
+                redirectAttributes.addFlashAttribute("errorMessage",
+                        "Something went wrong. Please try booking your appointment again.");
+                return "redirect:/patient/book";
+            }
 
             return "patient/book-appointment-time";
         }

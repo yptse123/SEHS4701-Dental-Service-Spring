@@ -2,118 +2,148 @@
  * Book Appointment Time Selection Page JavaScript
  */
 document.addEventListener('DOMContentLoaded', function() {
-    // Alert close functionality
-    const closeAlerts = document.querySelectorAll('.close-alert');
-    closeAlerts.forEach(function(button) {
-        button.addEventListener('click', function() {
-            this.parentElement.style.display = 'none';
-        });
-    });
+    console.log("Book appointment time script loaded");
     
-    // Auto-hide alerts after 5 seconds
-    setTimeout(function() {
-        document.querySelectorAll('.alert').forEach(function(alert) {
-            alert.style.display = 'none';
-        });
-    }, 5000);
+    // Get form and critical elements
+    const appointmentForm = document.getElementById('appointmentForm');
+    const clinicIdField = document.getElementById('clinicIdField');
     
-    // Handle time slot selection - visual feedback
+    // Log initial clinic ID value
+    console.log("Initial clinic ID value:", clinicIdField ? clinicIdField.value : "not found");
+    
+    // Setup time slot selection
+    setupTimeSlotSelection();
+    
+    // Setup form submission
+    if (appointmentForm) {
+        appointmentForm.addEventListener('submit', function(e) {
+            // Prevent default form submission temporarily
+            e.preventDefault();
+            
+            // Get required form fields
+            const selectedTimeSlot = document.querySelector('input[name="timeSlot"]:checked');
+            const selectedDentist = document.querySelector('input[name="dentistId"]:checked');
+            const termsCheckbox = document.querySelector('input[name="terms"]');
+            
+            // Validate all required fields
+            let errorMessage = '';
+            
+            // Check clinic ID
+            if (!clinicIdField || !clinicIdField.value || clinicIdField.value.trim() === '') {
+                errorMessage += 'Missing clinic information. Please use the "Fix ID" button. ';
+                console.error("Missing clinic ID!");
+            } else {
+                console.log("Using clinic ID:", clinicIdField.value);
+            }
+            
+            // Check other required fields
+            if (!selectedTimeSlot) errorMessage += 'Please select an appointment time. ';
+            if (!selectedDentist) errorMessage += 'Please select a dentist. ';
+            if (!termsCheckbox || !termsCheckbox.checked) errorMessage += 'Please agree to the terms. ';
+            
+            // If any validation errors, show alert and stop submission
+            if (errorMessage) {
+                alert(errorMessage.trim());
+                return;
+            }
+            
+            // Process time slot data
+            const timeSlotValue = selectedTimeSlot.value;
+            const timeParts = timeSlotValue.split('|');
+            
+            if (timeParts.length === 2) {
+                // Get or create the hidden time fields
+                let startTimeField = document.querySelector('input[name="startTime"]');
+                let endTimeField = document.querySelector('input[name="endTime"]');
+                
+                // If fields don't exist, create them
+                if (!startTimeField) {
+                    startTimeField = document.createElement('input');
+                    startTimeField.type = 'hidden';
+                    startTimeField.name = 'startTime';
+                    appointmentForm.appendChild(startTimeField);
+                }
+                
+                if (!endTimeField) {
+                    endTimeField = document.createElement('input');
+                    endTimeField.type = 'hidden';
+                    endTimeField.name = 'endTime';
+                    appointmentForm.appendChild(endTimeField);
+                }
+                
+                // Set the values
+                startTimeField.value = timeParts[0];
+                endTimeField.value = timeParts[1];
+                
+                console.log("Set start time:", startTimeField.value);
+                console.log("Set end time:", endTimeField.value);
+            }
+            
+            // Show form data before submission
+            const formData = new FormData(appointmentForm);
+            console.log("=== FORM SUBMISSION VALUES ===");
+            for (const [name, value] of formData.entries()) {
+                console.log(`${name}: ${value}`);
+            }
+            console.log("===============================");
+            
+            // Show loading state on button
+            const submitBtn = document.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
+            }
+            
+            // Submit the form
+            console.log("Submitting form...");
+            appointmentForm.submit();
+        });
+    } else {
+        console.error("Appointment form not found!");
+    }
+    
+    // Make recoverClinicId function available globally
+    window.recoverClinicId = function() {
+        const clinicId = prompt("Enter the clinic ID:", "");
+        if (clinicId && !isNaN(clinicId)) {
+            if (clinicIdField) {
+                clinicIdField.value = clinicId;
+                console.log("Manually set clinic ID to:", clinicId);
+                
+                // Update visual display
+                const clinicIdValue = document.getElementById('clinicIdValue');
+                if (clinicIdValue) {
+                    clinicIdValue.textContent = `(ID: ${clinicId})`;
+                    clinicIdValue.style.color = '#2e7d32';
+                }
+                
+                alert("Clinic ID has been set to: " + clinicId);
+            } else {
+                alert("Error: Could not find clinic ID field in the form");
+            }
+        } else {
+            alert("Invalid clinic ID. Please enter a valid number.");
+        }
+    };
+});
+
+/**
+ * Setup time slot selection behavior
+ */
+function setupTimeSlotSelection() {
     const timeSlots = document.querySelectorAll('.time-slot input[type="radio"]');
     timeSlots.forEach(function(slot) {
         slot.addEventListener('change', function() {
-            // Highlight the selected time period section
             if (this.checked) {
                 document.querySelectorAll('.time-period').forEach(function(period) {
                     period.classList.remove('active-period');
                 });
                 
-                // Find parent time period and add active class
                 const parentPeriod = this.closest('.time-period');
                 if (parentPeriod) {
                     parentPeriod.classList.add('active-period');
-                    
-                    // Scroll to make sure it's visible if needed
-                    parentPeriod.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 }
             }
         });
     });
-    
-    // Form submission handling - extract time slot values
-    const appointmentForm = document.getElementById('appointmentForm');
-    if (appointmentForm) {
-        appointmentForm.addEventListener('submit', function(e) {
-            const selectedTimeSlot = document.querySelector('input[name="timeSlot"]:checked');
-            const selectedDentist = document.querySelector('input[name="dentistId"]:checked');
-            const termsCheckbox = document.querySelector('input[name="terms"]');
-            
-            if (!selectedTimeSlot || !selectedDentist || !termsCheckbox.checked) {
-                e.preventDefault();
-                
-                // Show error message
-                let errorMessage = '';
-                if (!selectedTimeSlot) {
-                    errorMessage += 'Please select an appointment time. ';
-                }
-                if (!selectedDentist) {
-                    errorMessage += 'Please select a dentist. ';
-                }
-                if (!termsCheckbox.checked) {
-                    errorMessage += 'Please agree to the terms.';
-                }
-                
-                // Create alert if doesn't exist
-                let alert = document.querySelector('.alert.alert-danger');
-                if (!alert) {
-                    alert = document.createElement('div');
-                    alert.className = 'alert alert-danger';
-                    alert.innerHTML = `
-                        <i class="fas fa-exclamation-circle"></i>
-                        ${errorMessage}
-                        <button type="button" class="close-alert">&times;</button>
-                    `;
-                    
-                    const pageHeader = document.querySelector('.page-header');
-                    pageHeader.parentNode.insertBefore(alert, pageHeader.nextSibling);
-                    
-                    // Add close functionality
-                    alert.querySelector('.close-alert').addEventListener('click', function() {
-                        alert.style.display = 'none';
-                    });
-                } else {
-                    alert.innerHTML = `
-                        <i class="fas fa-exclamation-circle"></i>
-                        ${errorMessage}
-                        <button type="button" class="close-alert">&times;</button>
-                    `;
-                    alert.style.display = 'flex';
-                }
-                
-                return;
-            }
-            
-            // Extract start time and end time from selected time slot
-            const timeSlotValue = selectedTimeSlot.value;
-            const [startTime, endTime] = timeSlotValue.split('|');
-            
-            // Add hidden fields for start and end time
-            let startTimeInput = document.querySelector('input[name="startTime"]');
-            if (!startTimeInput) {
-                startTimeInput = document.createElement('input');
-                startTimeInput.type = 'hidden';
-                startTimeInput.name = 'startTime';
-                appointmentForm.appendChild(startTimeInput);
-            }
-            startTimeInput.value = startTime;
-            
-            let endTimeInput = document.querySelector('input[name="endTime"]');
-            if (!endTimeInput) {
-                endTimeInput = document.createElement('input');
-                endTimeInput.type = 'hidden';
-                endTimeInput.name = 'endTime';
-                appointmentForm.appendChild(endTimeInput);
-            }
-            endTimeInput.value = endTime;
-        });
-    }
-});
+}
