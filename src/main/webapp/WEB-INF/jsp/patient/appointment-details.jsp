@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="<c:url value='/css/dashboard.css'/>">
     <link rel="stylesheet" href="<c:url value='/css/appointments.css'/>">
+    <link rel="stylesheet" href="<c:url value='/css/patient/appointment-details.css'/>">
 </head>
 <body>
     <div class="dashboard-container">
@@ -140,7 +141,7 @@
                             </div>
                             <div class="card-body p-0">
                                 <div class="map-container">
-                                    <img src="https://maps.googleapis.com/maps/api/staticmap?center=${appointment.clinic.address},${appointment.clinic.city},${appointment.clinic.postalCode}&zoom=15&size=600x300&markers=color:red%7C${appointment.clinic.address},${appointment.clinic.city},${appointment.clinic.postalCode}&key=YOUR_GOOGLE_MAPS_API_KEY" 
+                                    <img src="https://maps.googleapis.com/maps/api/staticmap?center=${appointment.clinic.address},${appointment.clinic.city},${appointment.clinic.postalCode}&zoom=15&size=600x300&markers=color:red%7C${appointment.clinic.address},${appointment.clinic.city},${appointment.clinic.postalCode}&key=AIzaSyDewRVkvQ9vrv1Ky80wl5N1IAmH0xUZ_7U" 
                                          alt="Clinic location map" class="clinic-map">
                                 </div>
                             </div>
@@ -203,17 +204,17 @@
                     <h2>Your Recent Appointments</h2>
                     <a href="<c:url value='/patient/appointments'/>" class="view-all">View All</a>
                 </div>
-                
-                <div class="card">
-                    <div class="card-body p-0">
+
+                <div class="card appointment-history-card">
+                    <div class="card-body p-0"> <!-- We'll keep p-0 but manage internal spacing better -->
                         <div class="table-responsive">
                             <table class="recent-appointments-table">
                                 <thead>
                                     <tr>
-                                        <th>Date</th>
-                                        <th>Dentist</th>
-                                        <th>Clinic</th>
-                                        <th>Status</th>
+                                        <th scope="col">Date & Time</th>
+                                        <th scope="col">Dentist</th>
+                                        <th scope="col">Clinic</th>
+                                        <th scope="col">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -222,13 +223,15 @@
                                             <c:forEach items="${recentAppointments}" var="recentAppointment">
                                                 <tr class="${recentAppointment.id == appointment.id ? 'current-appointment' : ''}">
                                                     <td>
-                                                        <div class="date-badge small">
-                                                            <fmt:parseDate value="${recentAppointment.appointmentDate}" pattern="yyyy-MM-dd" var="parsedDate" type="date" />
-                                                            <fmt:formatDate value="${parsedDate}" pattern="MMM d, yyyy" />
-                                                        </div>
-                                                        <div class="time-badge small">
-                                                            <fmt:parseDate value="${recentAppointment.startTime}" pattern="HH:mm" var="parsedStartTime" type="time" />
-                                                            <fmt:formatDate value="${parsedStartTime}" pattern="h:mm a" />
+                                                        <div class="appointment-time-info">
+                                                            <div class="date-badge small">
+                                                                <fmt:parseDate value="${recentAppointment.appointmentDate}" pattern="yyyy-MM-dd" var="parsedDate" type="date" />
+                                                                <fmt:formatDate value="${parsedDate}" pattern="MMM d, yyyy" />
+                                                            </div>
+                                                            <div class="time-badge small">
+                                                                <fmt:parseDate value="${recentAppointment.startTime}" pattern="HH:mm" var="parsedStartTime" type="time" />
+                                                                <fmt:formatDate value="${parsedStartTime}" pattern="h:mm a" />
+                                                            </div>
                                                         </div>
                                                     </td>
                                                     <td>Dr. ${recentAppointment.dentist.firstName} ${recentAppointment.dentist.lastName}</td>
