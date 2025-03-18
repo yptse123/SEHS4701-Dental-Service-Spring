@@ -15,26 +15,34 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Controller
 @RequestMapping("/patient")
 public class PatientAppointmentController {
-
+    
+    private static final Logger logger = LoggerFactory.getLogger(PatientAppointmentController.class);
+    
     private final PatientService patientService;
     private final AppointmentService appointmentService;
     private final DentistService dentistService;
     private final ClinicService clinicService;
     private final UserService userService;
+    private final EmailService emailService;
 
     public PatientAppointmentController(PatientService patientService,
             AppointmentService appointmentService,
             DentistService dentistService,
             ClinicService clinicService,
-            UserService userService) {
+            UserService userService,
+            EmailService emailService) {
         this.patientService = patientService;
         this.appointmentService = appointmentService;
         this.dentistService = dentistService;
         this.clinicService = clinicService;
         this.userService = userService;
+        this.emailService = emailService;
     }
 
     @ExceptionHandler(RuntimeException.class)
@@ -240,10 +248,21 @@ public class PatientAppointmentController {
             appointment.setUpdatedAt(LocalDateTime.now());
 
             // Save the appointment
-            appointmentService.save(appointment);
+            appointment = appointmentService.save(appointment);
 
+            // Send confirmation email
+            try {
+                emailService.sendAppointmentConfirmation(appointment);
+                logger.info("Appointment confirmation email sent for appointment ID: {}", appointment.getId());
+            } catch (Exception emailEx) {
+                logger.error("Failed to send confirmation email: {}", emailEx.getMessage());
+                // Don't stop the process if email fails - just log the error
+            }
+            
             // Set success message
-            redirectAttributes.addFlashAttribute("successMessage", "Your appointment has been booked successfully!");
+            redirectAttributes.addFlashAttribute("successMessage", 
+                "Your appointment has been booked successfully! A confirmation email has been sent to your email address.");
+            
             return "redirect:/patient/appointments";
         } catch (Exception e) {
             // Log the exception for debugging
@@ -340,6 +359,15 @@ public class PatientAppointmentController {
 
         // Save the appointment
         appointmentService.save(appointment);
+
+        // Send cancellation email
+        try {
+            emailService.sendAppointmentCancellation(appointment);
+            logger.info("Appointment cancellation email sent for appointment ID: {}", appointment.getId());
+        } catch (Exception emailEx) {
+            logger.error("Failed to send cancellation email: {}", emailEx.getMessage());
+            // Don't stop the process if email fails - just log the error
+        }
 
         // Set success message
         redirectAttributes.addFlashAttribute("successMessage", "Your appointment has been cancelled successfully.");
