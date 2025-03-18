@@ -86,7 +86,7 @@
         
         <p>We look forward to seeing you soon!</p>
         
-        <a th:href="@{'http://localhost:8080/patient/appointments/' + ${appointmentId}}" class="button">View Appointment</a>
+        <a th:href="${baseUrl + '/patient/appointments/' + appointmentId}" class="button">View Appointment</a>
         
         <p>If you have any questions or concerns, please don't hesitate to contact us.</p>
         

@@ -1,20 +1,20 @@
 package com.example.webapp.service;
 
 import com.example.webapp.model.Appointment;
+import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-import org.thymeleaf.spring6.SpringTemplateEngine;
-import org.thymeleaf.templatemode.TemplateMode;
-import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
@@ -22,45 +22,34 @@ import java.util.Locale;
 public class EmailServiceImpl implements EmailService {
 
     private static final Logger logger = LoggerFactory.getLogger(EmailServiceImpl.class);
+    private static final DateTimeFormatter LOG_TIMESTAMP = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Value("${spring.mail.username:noreply@hkdental.com}")
     private String fromEmail;
 
     @Value("${app.name:Hong Kong Dental Clinic}")
     private String appName;
+
+    @Value("${app.base-url:http://localhost:8080}")
+    private String baseUrl;
     
     private final JavaMailSender emailSender;
     private final TemplateEngine templateEngine;
 
-    public EmailServiceImpl(JavaMailSender emailSender) {
+    public EmailServiceImpl(JavaMailSender emailSender, TemplateEngine templateEngine) {
         this.emailSender = emailSender;
-        
-        // Set up a dedicated template engine for emails
-        this.templateEngine = createTemplateEngine();
-    }
-    
-    /**
-     * Create and configure a template engine specifically for email templates
-     */
-    private TemplateEngine createTemplateEngine() {
-        SpringTemplateEngine templateEngine = new SpringTemplateEngine();
-        
-        ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
-        templateResolver.setPrefix("templates/emails/");  // Path in classpath
-        templateResolver.setSuffix(".html");
-        templateResolver.setTemplateMode(TemplateMode.HTML);
-        templateResolver.setCharacterEncoding("UTF-8");
-        templateResolver.setCacheable(false);  // For development, set to true for production
-        
-        templateEngine.setTemplateResolver(templateResolver);
-        return templateEngine;
+        this.templateEngine = templateEngine;
     }
 
     @Override
     public void sendAppointmentConfirmation(Appointment appointment) {
+        String toEmail = appointment.getPatient().getUser().getEmail();
+        String logPrefix = createLogPrefix("CONFIRMATION", appointment.getId());
+        
+        logger.info("{} Preparing to send appointment confirmation email FROM: {} TO: {}", 
+                logPrefix, fromEmail, toEmail);
+        
         try {
-            // Get email address of patient
-            String toEmail = appointment.getPatient().getUser().getEmail();
             String patientName = appointment.getPatient().getFirstName() + " " + appointment.getPatient().getLastName();
             
             // Format date and time
@@ -73,6 +62,7 @@ public class EmailServiceImpl implements EmailService {
             
             // Set up Thymeleaf context
             final Context ctx = new Context();
+            ctx.setVariable("baseUrl", baseUrl);
             ctx.setVariable("patientName", patientName);
             ctx.setVariable("appointmentDate", appointmentDate);
             ctx.setVariable("startTime", startTime);
@@ -85,8 +75,11 @@ public class EmailServiceImpl implements EmailService {
             ctx.setVariable("appointmentId", appointment.getId());
             ctx.setVariable("appName", appName);
             
+            logger.debug("{} Template context variables set successfully", logPrefix);
+            
             // Process the HTML template with Thymeleaf
             final String htmlContent = this.templateEngine.process("appointment-confirmation", ctx);
+            logger.debug("{} Template processed successfully", logPrefix);
             
             // Send email
             MimeMessage message = emailSender.createMimeMessage();
@@ -97,24 +90,43 @@ public class EmailServiceImpl implements EmailService {
             helper.setSubject("Your Dental Appointment Confirmation - " + appName);
             helper.setText(htmlContent, true);
             
-            emailSender.send(message);
-            logger.info("Appointment confirmation email sent to {}", toEmail);
+            logger.debug("{} About to send email message", logPrefix);
+            long startTimeL = System.currentTimeMillis();
             
+            emailSender.send(message);
+            
+            long endTimeL = System.currentTimeMillis();
+            logger.info("{} Email sent successfully FROM: {} TO: {} in {}ms", 
+                    logPrefix, fromEmail, toEmail, (endTimeL - startTimeL));
+            
+        } catch (MessagingException e) {
+            logger.error("{} Failed to prepare confirmation email TO: {} - Error: {}", 
+                    logPrefix, toEmail, e.getMessage(), e);
+        } catch (MailException e) {
+            logger.error("{} Failed to send confirmation email FROM: {} TO: {} - Error: {}", 
+                    logPrefix, fromEmail, toEmail, e.getMessage(), e);
         } catch (Exception e) {
-            logger.error("Failed to send appointment confirmation email", e);
+            logger.error("{} Unexpected error sending confirmation email TO: {} - Error: {}", 
+                    logPrefix, toEmail, e.getMessage(), e);
         }
     }
 
     @Override
     public void sendAppointmentCancellation(Appointment appointment) {
+        String toEmail = appointment.getPatient().getUser().getEmail();
+        String logPrefix = createLogPrefix("CANCELLATION", appointment.getId());
+        
+        logger.info("{} Preparing to send appointment cancellation email FROM: {} TO: {}", 
+                logPrefix, fromEmail, toEmail);
+        
         try {
-            String toEmail = appointment.getPatient().getUser().getEmail();
             String patientName = appointment.getPatient().getFirstName() + " " + appointment.getPatient().getLastName();
             
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy", Locale.ENGLISH);
             DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("h:mm a", Locale.ENGLISH);
             
             final Context ctx = new Context();
+            ctx.setVariable("baseUrl", baseUrl);
             ctx.setVariable("patientName", patientName);
             ctx.setVariable("appointmentDate", appointment.getAppointmentDate().format(dateFormatter));
             ctx.setVariable("startTime", appointment.getStartTime().format(timeFormatter));
@@ -122,7 +134,10 @@ public class EmailServiceImpl implements EmailService {
             ctx.setVariable("appointmentId", appointment.getId());
             ctx.setVariable("appName", appName);
             
+            logger.debug("{} Template context variables set successfully", logPrefix);
+            
             final String htmlContent = this.templateEngine.process("appointment-cancellation", ctx);
+            logger.debug("{} Template processed successfully", logPrefix);
             
             MimeMessage message = emailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -132,24 +147,43 @@ public class EmailServiceImpl implements EmailService {
             helper.setSubject("Dental Appointment Cancellation - " + appName);
             helper.setText(htmlContent, true);
             
-            emailSender.send(message);
-            logger.info("Appointment cancellation email sent to {}", toEmail);
+            logger.debug("{} About to send email message", logPrefix);
+            long startTime = System.currentTimeMillis();
             
+            emailSender.send(message);
+            
+            long endTime = System.currentTimeMillis();
+            logger.info("{} Email sent successfully FROM: {} TO: {} in {}ms", 
+                    logPrefix, fromEmail, toEmail, (endTime - startTime));
+            
+        } catch (MessagingException e) {
+            logger.error("{} Failed to prepare cancellation email TO: {} - Error: {}", 
+                    logPrefix, toEmail, e.getMessage(), e);
+        } catch (MailException e) {
+            logger.error("{} Failed to send cancellation email FROM: {} TO: {} - Error: {}", 
+                    logPrefix, fromEmail, toEmail, e.getMessage(), e);
         } catch (Exception e) {
-            logger.error("Failed to send appointment cancellation email", e);
+            logger.error("{} Unexpected error sending cancellation email TO: {} - Error: {}", 
+                    logPrefix, toEmail, e.getMessage(), e);
         }
     }
 
     @Override
     public void sendAppointmentReminder(Appointment appointment) {
+        String toEmail = appointment.getPatient().getUser().getEmail();
+        String logPrefix = createLogPrefix("REMINDER", appointment.getId());
+        
+        logger.info("{} Preparing to send appointment reminder email FROM: {} TO: {}", 
+                logPrefix, fromEmail, toEmail);
+        
         try {
-            String toEmail = appointment.getPatient().getUser().getEmail();
             String patientName = appointment.getPatient().getFirstName() + " " + appointment.getPatient().getLastName();
             
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy", Locale.ENGLISH);
             DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("h:mm a", Locale.ENGLISH);
             
             final Context ctx = new Context();
+            ctx.setVariable("baseUrl", baseUrl);
             ctx.setVariable("patientName", patientName);
             ctx.setVariable("appointmentDate", appointment.getAppointmentDate().format(dateFormatter));
             ctx.setVariable("startTime", appointment.getStartTime().format(timeFormatter));
@@ -161,7 +195,10 @@ public class EmailServiceImpl implements EmailService {
             ctx.setVariable("appointmentId", appointment.getId());
             ctx.setVariable("appName", appName);
             
+            logger.debug("{} Template context variables set successfully", logPrefix);
+            
             final String htmlContent = this.templateEngine.process("appointment-reminder", ctx);
+            logger.debug("{} Template processed successfully", logPrefix);
             
             MimeMessage message = emailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -171,16 +208,34 @@ public class EmailServiceImpl implements EmailService {
             helper.setSubject("Reminder: Your Dental Appointment Tomorrow - " + appName);
             helper.setText(htmlContent, true);
             
-            emailSender.send(message);
-            logger.info("Appointment reminder email sent to {}", toEmail);
+            logger.debug("{} About to send email message", logPrefix);
+            long startTime = System.currentTimeMillis();
             
+            emailSender.send(message);
+            
+            long endTime = System.currentTimeMillis();
+            logger.info("{} Email sent successfully FROM: {} TO: {} in {}ms", 
+                    logPrefix, fromEmail, toEmail, (endTime - startTime));
+            
+        } catch (MessagingException e) {
+            logger.error("{} Failed to prepare reminder email TO: {} - Error: {}", 
+                    logPrefix, toEmail, e.getMessage(), e);
+        } catch (MailException e) {
+            logger.error("{} Failed to send reminder email FROM: {} TO: {} - Error: {}", 
+                    logPrefix, fromEmail, toEmail, e.getMessage(), e);
         } catch (Exception e) {
-            logger.error("Failed to send appointment reminder email", e);
+            logger.error("{} Unexpected error sending reminder email TO: {} - Error: {}", 
+                    logPrefix, toEmail, e.getMessage(), e);
         }
     }
 
     @Override
     public void sendSimpleMessage(String to, String subject, String text) {
+        String logPrefix = createLogPrefix("SIMPLE", null);
+        
+        logger.info("{} Preparing to send simple email FROM: {} TO: {}", 
+                logPrefix, fromEmail, to);
+        
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
@@ -188,15 +243,31 @@ public class EmailServiceImpl implements EmailService {
             message.setSubject(subject);
             message.setText(text);
             
+            logger.debug("{} About to send simple email message with subject: {}", logPrefix, subject);
+            long startTime = System.currentTimeMillis();
+            
             emailSender.send(message);
-            logger.info("Simple email sent to {}", to);
+            
+            long endTime = System.currentTimeMillis();
+            logger.info("{} Simple email sent successfully FROM: {} TO: {} in {}ms", 
+                    logPrefix, fromEmail, to, (endTime - startTime));
+            
+        } catch (MailException e) {
+            logger.error("{} Failed to send simple email FROM: {} TO: {} - Error: {}", 
+                    logPrefix, fromEmail, to, e.getMessage(), e);
         } catch (Exception e) {
-            logger.error("Failed to send simple email", e);
+            logger.error("{} Unexpected error sending simple email TO: {} - Error: {}", 
+                    logPrefix, to, e.getMessage(), e);
         }
     }
 
     @Override
     public void sendHtmlMessage(String to, String subject, String htmlContent) {
+        String logPrefix = createLogPrefix("HTML", null);
+        
+        logger.info("{} Preparing to send HTML email FROM: {} TO: {}", 
+                logPrefix, fromEmail, to);
+        
         try {
             MimeMessage message = emailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -206,10 +277,33 @@ public class EmailServiceImpl implements EmailService {
             helper.setSubject(subject);
             helper.setText(htmlContent, true);
             
+            logger.debug("{} About to send HTML email message with subject: {}", logPrefix, subject);
+            long startTime = System.currentTimeMillis();
+            
             emailSender.send(message);
-            logger.info("HTML email sent to {}", to);
+            
+            long endTime = System.currentTimeMillis();
+            logger.info("{} HTML email sent successfully FROM: {} TO: {} in {}ms", 
+                    logPrefix, fromEmail, to, (endTime - startTime));
+            
+        } catch (MessagingException e) {
+            logger.error("{} Failed to prepare HTML email TO: {} - Error: {}", 
+                    logPrefix, to, e.getMessage(), e);
+        } catch (MailException e) {
+            logger.error("{} Failed to send HTML email FROM: {} TO: {} - Error: {}", 
+                    logPrefix, fromEmail, to, e.getMessage(), e);
         } catch (Exception e) {
-            logger.error("Failed to send HTML email", e);
+            logger.error("{} Unexpected error sending HTML email TO: {} - Error: {}", 
+                    logPrefix, to, e.getMessage(), e);
         }
+    }
+    
+    /**
+     * Create a consistent log prefix for all email-related logs
+     */
+    private String createLogPrefix(String emailType, Long appointmentId) {
+        String timestamp = LocalDateTime.now().format(LOG_TIMESTAMP);
+        String id = appointmentId != null ? "APPT_ID:" + appointmentId : "GENERAL";
+        return String.format("[EMAIL_%s][%s][%s]", emailType, id, timestamp);
     }
 }
