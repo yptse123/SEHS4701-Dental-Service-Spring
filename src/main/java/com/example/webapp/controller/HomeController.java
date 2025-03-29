@@ -5,14 +5,30 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class HomeController {
-    
+
     @GetMapping("/")
     public String home() {
-        return "home"; // This will render home.jsp
+        return "index";  // This will resolve to /WEB-INF/jsp/index.jsp
     }
     
     @GetMapping("/home")
     public String homePage() {
-        return "home"; // This will also render home.jsp
+        return "index";
+    }
+    
+    // Add any additional public pages here
+    @GetMapping("/services")
+    public String services() {
+        return "services";
+    }
+    
+    @GetMapping("/about")
+    public String about() {
+        return "about";
+    }
+    
+    @GetMapping("/contact")
+    public String contact() {
+        return "contact";
     }
 }
