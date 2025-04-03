@@ -131,8 +131,9 @@ public class PatientAppointmentController {
 
     // Show appointment booking form
     @GetMapping("/book")
-    public String showBookingForm(Model model) {
-        // For initial appointment form
+    public String showBookingForm(Model model ) {
+        logger.info("==================Booking form accessed============");
+      
         model.addAttribute("appointment", new Appointment());
 
         // Get all active clinics for selection

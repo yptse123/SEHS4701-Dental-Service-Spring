@@ -9,89 +9,9 @@
     <title>Hong Kong Dental Clinic - Professional Dental Care</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="<c:url value='/css/public-site.css'/>">
+    <link rel="stylesheet" href="<c:url value='/static/css/public-site.css'/>">
     <style>
-        /* Hero section */
-        .hero-section {
-            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('<c:url value="/images/dental-hero.jpg"/>') no-repeat center;
-            background-size: cover;
-            color: white;
-            padding: 120px 0;
-            margin-bottom: 2rem;
-        }
-        
-        /* Service cards */
-        .service-card {
-            border: none;
-            border-radius: 8px;
-            transition: transform 0.3s, box-shadow 0.3s;
-            margin-bottom: 1.5rem;
-        }
-        
-        .service-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
-        
-        .service-icon {
-            font-size: 2.5rem;
-            color: #0d6efd;
-            margin-bottom: 1rem;
-        }
-        
-        /* Testimonials */
-        .testimonial-card {
-            border-radius: 15px;
-            margin: 20px 10px;
-        }
-        
-        .testimonial-img {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-        
-        /* Call to action */
-        .cta-section {
-            background-color: #f8f9fa;
-            padding: 80px 0;
-        }
-        
-        /* Footer */
-        footer {
-            background-color: #212529;
-            color: white;
-            padding: 60px 0 20px;
-        }
-        
-        .footer-heading {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            color: #fff;
-        }
-        
-        .footer-link {
-            color: #adb5bd;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        
-        .footer-link:hover {
-            color: white;
-        }
-        
-        .social-icons a {
-            display: inline-block;
-            margin-right: 15px;
-            color: #adb5bd;
-            font-size: 1.2rem;
-            transition: color 0.3s;
-        }
-        
-        .social-icons a:hover {
-            color: white;
-        }
+   
     </style>
 </head>
 <body>
@@ -99,8 +19,8 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
         <div class="container">
             <a class="navbar-brand" href="<c:url value='/'/>">
-                <img src="<c:url value='/images/logo.png'/>" alt="HK Dental Logo" height="40">
-                HK Dental Clinic
+               <!-- <img src="<c:url value='/static/image/smile dental logo.png'/>" alt="HK Dental Care Logo" height="40"> -->
+                Dental <span class="main-color" style="color: #8fd7f8;">Care</span>  
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -134,12 +54,16 @@
     </nav>
 
     <!-- Hero Section -->
-    <section class="hero-section text-center">
-        <div class="container">
-            <h1 class="display-4 fw-bold">Professional Dental Care in Hong Kong</h1>
-            <p class="lead mb-4">Quality dental services with modern facilities and experienced professionals</p>
-            <a href="<c:url value='/patient/book'/>" class="btn btn-primary btn-lg">Book an Appointment</a>
-            <a href="#services" class="btn btn-outline-light btn-lg ms-3">Our Services</a>
+    <section class="hero-section">
+        <div class="hero-overlay">
+            <div class="container">
+                <div class="hero-container text-white">
+                    <h1 class="display-4 fw-bold">We Care About Your Brightest Smile</h1>
+                    <p class="lead mb-4">We're committed to providing personalized dental care that enhances your oral health and keeps your smile radiant for a lifetime</p>
+                    <a href="<c:url value='/patient/book'/>" class="btn btn-primary btn-lg">Book an Appointment</a>
+                    <a href="#services" class="btn btn-outline-light btn-lg ms-3">Our Services</a>
+                </div>
+            </div>
         </div>
     </section>
 
