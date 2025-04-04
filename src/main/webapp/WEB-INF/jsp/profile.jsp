@@ -69,16 +69,25 @@
                                                     </button>
                                                 </div>
                                                 <div class="profile-title">
-                                                    <h2>${not empty user.profile.firstName ? user.profile.fullName :
-                                                        user.username}</h2>
+                                                    <sec:authorize access="hasRole('PATIENT')">
+                                                        <!-- Add debugging output -->
+                                                        <div style="display:none">
+                                                            Debug - Patient object exists: ${patient != null}
+                                                            Patient name: ${patient.firstName} ${patient.lastName}
+                                                            Patient phone: ${patient.phoneNumber}
+                                                        </div>
+                                                        
+                                                        <h2>${patient.firstName} ${patient.lastName}</h2>
+                                                    </sec:authorize>
+                                                    <sec:authorize access="!hasRole('PATIENT')">
+                                                        <h2>${not empty user.profile.firstName ? user.profile.fullName : user.username}</h2>
+                                                    </sec:authorize>
                                                     <p class="profile-subtitle">${user.email}</p>
+                                                    
                                                     <div class="profile-role-badge">
-                                                        <sec:authorize access="hasRole('ADMIN')">Administrator
-                                                        </sec:authorize>
-                                                        <sec:authorize access="hasRole('DENTIST')">Dentist
-                                                        </sec:authorize>
-                                                        <sec:authorize access="hasRole('PATIENT')">Patient
-                                                        </sec:authorize>
+                                                        <sec:authorize access="hasRole('ADMIN')">Administrator</sec:authorize>
+                                                        <sec:authorize access="hasRole('DENTIST')">Dentist</sec:authorize>
+                                                        <sec:authorize access="hasRole('PATIENT')">Patient</sec:authorize>
                                                     </div>
                                                 </div>
                                             </div>
@@ -123,30 +132,60 @@
                                             <div class="info-section" id="personalInfoView">
                                                 <div class="info-group">
                                                     <div class="info-label">First Name</div>
-                                                    <div class="info-value">${not empty user.profile.firstName ?
-                                                        user.profile.firstName : 'Not provided'}</div>
+                                                    <div class="info-value">
+                                                        <sec:authorize access="hasRole('PATIENT')">
+                                                            ${not empty patient.firstName ? patient.firstName : 'Not provided'}
+                                                        </sec:authorize>
+                                                        <sec:authorize access="!hasRole('PATIENT')">
+                                                            ${not empty user.profile.firstName ? user.profile.firstName : 'Not provided'}
+                                                        </sec:authorize>
+                                                    </div>
                                                 </div>
                                                 <div class="info-group">
                                                     <div class="info-label">Last Name</div>
-                                                    <div class="info-value">${not empty user.profile.lastName ?
-                                                        user.profile.lastName : 'Not provided'}</div>
+                                                    <div class="info-value">
+                                                        <sec:authorize access="hasRole('PATIENT')">
+                                                            ${not empty patient.lastName ? patient.lastName : 'Not provided'}
+                                                        </sec:authorize>
+                                                        <sec:authorize access="!hasRole('PATIENT')">
+                                                            ${not empty user.profile.lastName ? user.profile.lastName : 'Not provided'}
+                                                        </sec:authorize>
+                                                    </div>
                                                 </div>
                                                 <div class="info-group">
                                                     <div class="info-label">Phone Number</div>
-                                                    <div class="info-value">${not empty user.profile.phoneNumber ?
-                                                        user.profile.phoneNumber : 'Not provided'}</div>
+                                                    <div class="info-value">
+                                                        <sec:authorize access="hasRole('PATIENT')">
+                                                            ${not empty patient.phoneNumber ? patient.phoneNumber : 'Not provided'}
+                                                        </sec:authorize>
+                                                        <sec:authorize access="!hasRole('PATIENT')">
+                                                            ${not empty user.profile.phoneNumber ? user.profile.phoneNumber : 'Not provided'}
+                                                        </sec:authorize>
+                                                    </div>
                                                 </div>
                                                 <div class="info-group">
                                                     <div class="info-label">Date of Birth</div>
                                                     <div class="info-value">
-                                                        <c:choose>
-                                                            <c:when test="${not empty user.profile.dateOfBirth}">
-                                                                ${df:formatDate(user.profile.dateOfBirth, 'dd/MM/yyyy')}
-                                                            </c:when>
-                                                            <c:otherwise>
-                                                                Not provided
-                                                            </c:otherwise>
-                                                        </c:choose>
+                                                        <sec:authorize access="hasRole('PATIENT')">
+                                                            <c:choose>
+                                                                <c:when test="${not empty patient.dateOfBirth}">
+                                                                    ${df:formatDate(patient.dateOfBirth, 'dd/MM/yyyy')}
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    Not provided
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </sec:authorize>
+                                                        <sec:authorize access="!hasRole('PATIENT')">
+                                                            <c:choose>
+                                                                <c:when test="${not empty user.profile.dateOfBirth}">
+                                                                    ${df:formatDate(user.profile.dateOfBirth, 'dd/MM/yyyy')}
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    Not provided
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </sec:authorize>
                                                     </div>
                                                 </div>
                                             </div>
@@ -154,42 +193,55 @@
                                             <!-- Edit Mode -->
                                             <div class="info-section hidden" id="personalInfoEdit">
                                                 <form action="<c:url value='/profile/update-info'/>" method="post">
-                                                    <input type="hidden" name="${_csrf.parameterName}"
-                                                        value="${_csrf.token}" />
+                                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 
                                                     <div class="form-group">
                                                         <label for="firstName">First Name</label>
-                                                        <input type="text" id="firstName" name="firstName"
-                                                            value="${user.profile.firstName}">
+                                                        <sec:authorize access="hasRole('PATIENT')">
+                                                            <input type="text" id="firstName" name="firstName" value="${patient.firstName}">
+                                                        </sec:authorize>
+                                                        <sec:authorize access="!hasRole('PATIENT')">
+                                                            <input type="text" id="firstName" name="firstName" value="${user.profile.firstName}">
+                                                        </sec:authorize>
                                                     </div>
 
                                                     <div class="form-group">
                                                         <label for="lastName">Last Name</label>
-                                                        <input type="text" id="lastName" name="lastName"
-                                                            value="${user.profile.lastName}">
+                                                        <sec:authorize access="hasRole('PATIENT')">
+                                                            <input type="text" id="lastName" name="lastName" value="${patient.lastName}">
+                                                        </sec:authorize>
+                                                        <sec:authorize access="!hasRole('PATIENT')">
+                                                            <input type="text" id="lastName" name="lastName" value="${user.profile.lastName}">
+                                                        </sec:authorize>
                                                     </div>
 
                                                     <div class="form-group">
                                                         <label for="phoneNumber">Phone Number</label>
-                                                        <input type="tel" id="phoneNumber" name="phoneNumber"
-                                                            value="${user.profile.phoneNumber}">
+                                                        <sec:authorize access="hasRole('PATIENT')">
+                                                            <input type="tel" id="phoneNumber" name="phoneNumber" value="${patient.phoneNumber}">
+                                                        </sec:authorize>
+                                                        <sec:authorize access="!hasRole('PATIENT')">
+                                                            <input type="tel" id="phoneNumber" name="phoneNumber" value="${user.profile.phoneNumber}">
+                                                        </sec:authorize>
                                                     </div>
 
                                                     <div class="form-group">
                                                         <label for="dateOfBirth">Date of Birth</label>
-                                                        <input type="date" id="dateOfBirth" name="dateOfBirth"
-                                                            value="${df:formatDate(user.profile.dateOfBirth, 'yyyy-MM-dd')}">
+                                                        <sec:authorize access="hasRole('PATIENT')">
+                                                            <input type="date" id="dateOfBirth" name="dateOfBirth" value="${df:formatDate(patient.dateOfBirth, 'yyyy-MM-dd')}">
+                                                        </sec:authorize>
+                                                        <sec:authorize access="!hasRole('PATIENT')">
+                                                            <input type="date" id="dateOfBirth" name="dateOfBirth" value="${df:formatDate(user.profile.dateOfBirth, 'yyyy-MM-dd')}">
+                                                        </sec:authorize>
                                                     </div>
 
                                                     <div class="form-actions">
-                                                        <button type="button" class="btn-cancel"
-                                                            id="cancelPersonalInfoBtn">Cancel</button>
+                                                        <button type="button" class="btn-cancel" id="cancelPersonalInfoBtn">Cancel</button>
                                                         <button type="submit" class="btn-save">Save Changes</button>
                                                     </div>
                                                 </form>
                                             </div>
                                         </div>
-
                                         <!-- Contact Information Section -->
                                         <div class="profile-card">
                                             <div class="card-header">

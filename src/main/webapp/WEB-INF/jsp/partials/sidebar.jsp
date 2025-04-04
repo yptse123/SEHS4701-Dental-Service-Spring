@@ -3,10 +3,13 @@
 
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h2><i class="fas fa-tooth"></i> <span>HKDC</span></h2>
-                <button id="sidebar-toggle" class="sidebar-toggle">
-                    <i class="fas fa-bars"></i>
-                </button>
+           
+                <h2><i class="fas fa-tooth"></i>  
+                    
+                    <!-- <img src="<c:url value='/static/image/smile dental logo.png'/>" alt="HK Dental Care Logo" height="40"> -->
+                    <span>  Dental</span> <span class="main-color" style="color: #8fd7f8;">Care</span>  
+                
+                </h2>
             </div>
 
             <div class="sidebar-user">
