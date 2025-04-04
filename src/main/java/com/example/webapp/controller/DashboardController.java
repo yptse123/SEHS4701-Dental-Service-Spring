@@ -26,6 +26,9 @@ import com.example.webapp.service.DentistService;
 import com.example.webapp.service.PatientService;
 import com.example.webapp.service.UserService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Controller
 public class DashboardController {
 
@@ -34,6 +37,7 @@ public class DashboardController {
     private final DentistService dentistService;
     private final ClinicService clinicService;
     private final AppointmentService appointmentService;
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     public DashboardController(UserService userService,
             PatientService patientService,
@@ -86,6 +90,9 @@ public class DashboardController {
             model.addAttribute("pendingAppointmentsCount",
                     appointmentService.countByStatus(Appointment.Status.SCHEDULED));
         } else if (role.equals("ROLE_DENTIST")) {
+
+            logger.info("Dentist dashboard accessed by user: {}", username);
+
             // Dentist-specific dashboard data
             Dentist dentist = dentistService.findByUser(user)
                     .orElseThrow(() -> new RuntimeException("Dentist profile not found"));
@@ -139,6 +146,9 @@ public class DashboardController {
 
             model.addAttribute("weeklySchedule", weeklySchedule);
         } else if (role.equals("ROLE_PATIENT")) {
+
+            logger.info("Patient dashboard accessed by user: {}", username);
+            
             // Patient-specific dashboard data
             Patient patient = patientService.findByUser(user)
                 .orElseThrow(() -> new RuntimeException("Patient profile not found"));

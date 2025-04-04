@@ -18,10 +18,13 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="<c:url value='/'/>">
-               <!-- <img src="<c:url value='/static/image/smile dental logo.png'/>" alt="HK Dental Care Logo" height="40"> -->
-                Dental <span class="main-color" style="color: #8fd7f8;">Care</span>  
-            </a>
+            <h2><i class="fas fa-tooth"></i>  
+                <a class="navbar-brand" href="<c:url value='/'/>">
+                <!-- <img src="<c:url value='/static/image/smile dental logo.png'/>" alt="HK Dental Care Logo" height="40"> -->
+                 Dental <span class="main-color" style="color: #8fd7f8;">Care</span>  
+             </a>
+            </h2>
+           
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -156,7 +159,7 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-6 mb-4 mb-lg-0">
-                    <img src="<c:url value='/images/clinic-interior.jpg'/>" alt="Clinic Interior" class="img-fluid rounded-3 shadow">
+                    <img src="<c:url value='/static/image/home/clinic-interior.jpg'/>" alt="Clinic Interior" class="img-fluid rounded-3 shadow">
                 </div>
                 <div class="col-lg-6">
                     <h2 class="fw-bold mb-4">About Our Clinic</h2>
@@ -180,7 +183,7 @@
             <div class="row">
                 <div class="col-md-4 mb-4">
                     <div class="card h-100 shadow-sm">
-                        <img src="<c:url value='/images/dentist1.jpg'/>" class="card-img-top" alt="Dr. Wei Chen">
+                        <img src="<c:url value='/static/image/dentist/dentist1.jpg'/>" class="card-img-top" alt="Dr. Wei Chen">
                         <div class="card-body text-center">
                             <h5 class="card-title">Dr. Wei Chen</h5>
                             <p class="text-muted">General Dentist</p>
@@ -191,7 +194,7 @@
                 
                 <div class="col-md-4 mb-4">
                     <div class="card h-100 shadow-sm">
-                        <img src="<c:url value='/images/dentist2.jpg'/>" class="card-img-top" alt="Dr. Sarah Wong">
+                        <img src="<c:url value='/static/image/dentist/dentist2.jpg'/>" class="card-img-top" alt="Dr. Sarah Wong">
                         <div class="card-body text-center">
                             <h5 class="card-title">Dr. Sarah Wong</h5>
                             <p class="text-muted">Orthodontist</p>
@@ -202,7 +205,7 @@
                 
                 <div class="col-md-4 mb-4">
                     <div class="card h-100 shadow-sm">
-                        <img src="<c:url value='/images/dentist3.jpg'/>" class="card-img-top" alt="Dr. James Lam">
+                        <img src="<c:url value='/static/image/dentist/dentist3.jpg'/>" class="card-img-top" alt="Dr. James Lam">
                         <div class="card-body text-center">
                             <h5 class="card-title">Dr. James Lam</h5>
                             <p class="text-muted">Cosmetic Dentist</p>
@@ -227,7 +230,7 @@
                     <div class="card testimonial-card h-100 p-4">
                         <div class="card-body">
                             <div class="d-flex align-items-center mb-3">
-                                <img src="<c:url value='/images/patient1.jpg'/>" alt="Patient 1" class="testimonial-img me-3">
+                                <img src="<c:url value='/static/image/patient/patient1.jpg'/>" alt="Patient 1" class="testimonial-img me-3">
                                 <div>
                                     <h5 class="mb-0">Michelle Tan</h5>
                                     <p class="text-muted mb-0">Patient since 2019</p>
@@ -249,7 +252,7 @@
                     <div class="card testimonial-card h-100 p-4">
                         <div class="card-body">
                             <div class="d-flex align-items-center mb-3">
-                                <img src="<c:url value='/images/patient2.jpg'/>" alt="Patient 2" class="testimonial-img me-3">
+                                <img src="<c:url value='/static/image/patient/patient2.jpg'/>" alt="Patient 2" class="testimonial-img me-3">
                                 <div>
                                     <h5 class="mb-0">John Lee</h5>
                                     <p class="text-muted mb-0">Patient since 2020</p>
@@ -271,7 +274,7 @@
                     <div class="card testimonial-card h-100 p-4">
                         <div class="card-body">
                             <div class="d-flex align-items-center mb-3">
-                                <img src="<c:url value='/images/patient3.jpg'/>" alt="Patient 3" class="testimonial-img me-3">
+                                <img src="<c:url value='/static/image/patient/patient3.jpg'/>" alt="Patient 3" class="testimonial-img me-3">
                                 <div>
                                     <h5 class="mb-0">Emma Cheung</h5>
                                     <p class="text-muted mb-0">Patient since 2018</p>

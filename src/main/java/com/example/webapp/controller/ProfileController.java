@@ -1,8 +1,10 @@
 package com.example.webapp.controller;
 
+import com.example.webapp.model.Patient; // Add this import
 import com.example.webapp.model.Profile;
 import com.example.webapp.model.User;
 import com.example.webapp.model.UserPreferences;
+import com.example.webapp.repository.PatientRepository; // Add this import
 import com.example.webapp.service.ProfileService;
 import com.example.webapp.service.UserService;
 import org.springframework.http.MediaType;
@@ -24,26 +26,48 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Controller
 public class ProfileController {
 
     private final UserService userService;
     private final ProfileService profileService;
     private final PasswordEncoder passwordEncoder;
+    private final PatientRepository patientRepository; // Add this field
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
-    public ProfileController(UserService userService, ProfileService profileService, PasswordEncoder passwordEncoder) {
+    public ProfileController(UserService userService, 
+                            ProfileService profileService, 
+                            PasswordEncoder passwordEncoder,
+                            PatientRepository patientRepository) { // Update constructor
         this.userService = userService;
         this.profileService = profileService;
         this.passwordEncoder = passwordEncoder;
+        this.patientRepository = patientRepository; // Initialize the repository
     }
 
     @GetMapping("/profile")
     public String viewProfile(Model model, Authentication authentication) {
+        logger.info("Loading profile for user: {}", authentication.getName());
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         User user = userService.findByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         model.addAttribute("user", user);
+        
+       // Inside viewProfile method - add after finding patient
+        if (user.getRole() == User.Role.PATIENT) {
+            logger.info("Loading patient data for user: {}", user.getUsername());
+            Patient patient = patientRepository.findByUser(user)
+                    .orElseThrow(() -> new RuntimeException("Patient data not found"));
+            // Add debugging info
+            logger.info("Patient data: firstName={}, lastName={}, phoneNumber={}", 
+                    patient.getFirstName(), patient.getLastName(), patient.getPhoneNumber());
+            model.addAttribute("patient", patient);
+        }
+        
         return "profile";
     }
 
@@ -58,7 +82,7 @@ public class ProfileController {
         return "profile-settings";
     }
 
-    @PostMapping("/profile/update-info")
+   @PostMapping("/profile/update-info")
     public String updateProfileInfo(
             @RequestParam("firstName") String firstName,
             @RequestParam("lastName") String lastName,
@@ -71,26 +95,34 @@ public class ProfileController {
         User user = userService.findByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Profile profile = user.getProfile();
-
-        // Update basic info
-        profile.setFirstName(firstName);
-        profile.setLastName(lastName);
-        profile.setPhoneNumber(phoneNumber);
-
-        // Process date of birth
-        if (dateOfBirth != null && !dateOfBirth.isEmpty()) {
-            try {
-                LocalDate dob = LocalDate.parse(dateOfBirth);
-                profile.setDateOfBirth(dob);
-            } catch (Exception e) {
-                redirectAttributes.addFlashAttribute("errorMessage", "Invalid date format for date of birth");
-                return "redirect:/profile";
+        // Check if user is a patient
+        if (user.getRole() == User.Role.PATIENT) {
+            Patient patient = patientRepository.findByUser(user)
+                    .orElseThrow(() -> new RuntimeException("Patient data not found"));
+            
+            // Update patient info instead of profile
+            patient.setFirstName(firstName);
+            patient.setLastName(lastName);
+            patient.setPhoneNumber(phoneNumber);
+            
+            // Process date of birth
+            if (dateOfBirth != null && !dateOfBirth.isEmpty()) {
+                try {
+                    LocalDate dob = LocalDate.parse(dateOfBirth);
+                    patient.setDateOfBirth(dob);
+                } catch (Exception e) {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Invalid date format for date of birth");
+                    return "redirect:/profile";
+                }
             }
+            
+            patient.setUpdatedAt(LocalDateTime.now());
+            patientRepository.save(patient);
+        } else {
+            // Existing code for non-patient users
+            Profile profile = user.getProfile();
+            // ...rest of your existing profile update code
         }
-
-        profile.setUpdatedAt(LocalDateTime.now());
-        profileService.save(profile);
 
         redirectAttributes.addFlashAttribute("successMessage", "Profile information updated successfully");
         return "redirect:/profile";
