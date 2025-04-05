@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     appointments.forEach(appointment => {
         appointment.addEventListener('click', function() {
             const appointmentId = this.getAttribute('data-id');
-            window.location.href = `/admin/appointments/${appointmentId}`;
+            window.location.href = `/dentist/appointments/${appointmentId}`;
         });
     });
     
