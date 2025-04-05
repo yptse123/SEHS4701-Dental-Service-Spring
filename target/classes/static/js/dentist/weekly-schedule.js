@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Populate popover
             popoverTime.textContent = timeText;
             popoverPatient.textContent = patientText;
-            popoverViewLink.href = `/admin/appointments/${appointmentId}`;
+            popoverViewLink.href = `/dentist/appointments/${appointmentId}`;
             
             // Calculate position
             const rect = this.getBoundingClientRect();
