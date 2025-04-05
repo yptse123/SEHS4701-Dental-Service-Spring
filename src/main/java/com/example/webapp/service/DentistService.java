@@ -123,4 +123,7 @@ public interface DentistService {
      * Count all active dentists
      */
     long countAllActive();
+
+    // Add to DentistService interface
+    List<Dentist> findByClinicAndDayOfWeek(Clinic clinic, String dayOfWeek);
 }

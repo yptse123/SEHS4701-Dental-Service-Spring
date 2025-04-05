@@ -4,10 +4,13 @@ import com.example.webapp.model.Appointment;
 import com.example.webapp.model.Clinic;
 import com.example.webapp.model.Dentist;
 import com.example.webapp.model.Patient;
+import com.example.webapp.model.Schedule;
 import com.example.webapp.repository.AppointmentRepository;
 import com.example.webapp.repository.ClinicRepository;
 import com.example.webapp.repository.DentistRepository;
 import com.example.webapp.repository.PatientRepository;
+import com.example.webapp.repository.ScheduleRepository;
+
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Join;
 import jakarta.transaction.Transactional;
@@ -18,11 +21,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -32,16 +38,19 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final PatientRepository patientRepository;
     private final DentistRepository dentistRepository;
     private final ClinicRepository clinicRepository;
+    private final ScheduleRepository scheduleRepository;
 
     public AppointmentServiceImpl(
             AppointmentRepository appointmentRepository,
             PatientRepository patientRepository,
             DentistRepository dentistRepository,
-            ClinicRepository clinicRepository) {
+            ClinicRepository clinicRepository,
+            ScheduleRepository scheduleRepository) {
         this.appointmentRepository = appointmentRepository;
         this.patientRepository = patientRepository;
         this.dentistRepository = dentistRepository;
         this.clinicRepository = clinicRepository;
+        this.scheduleRepository = scheduleRepository;
     }
 
     @Override
@@ -596,5 +605,33 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
 
         return availableSlots;
+    }
+
+    @Override
+    public List<Map<String, String>> getDentistScheduleForDate(Dentist dentist, LocalDate date) {
+        List<Map<String, String>> scheduleData = new ArrayList<>(); // Initialize as empty list
+
+        if (dentist == null || date == null) {
+            return scheduleData; // Return empty list if parameters are null
+        }
+
+        // Get the day of week for the date
+        DayOfWeek dayOfWeek = date.getDayOfWeek();
+        String dayOfWeekString = dayOfWeek.toString(); // This gives "MONDAY", "TUESDAY", etc.
+
+        // Find the schedule for this dentist for this day of week
+        List<Schedule> schedules = scheduleRepository.findByDentistIdAndDayOfWeek(
+                dentist.getId(), dayOfWeekString);
+
+        for (Schedule schedule : schedules) {
+            Map<String, String> timeSlot = new HashMap<>();
+            timeSlot.put("clinicId", String.valueOf(schedule.getClinic().getId()));
+            timeSlot.put("dayOfWeek", schedule.getDayOfWeek());
+            timeSlot.put("startTime", schedule.getStartTime().toString());
+            timeSlot.put("endTime", schedule.getEndTime().toString());
+            scheduleData.add(timeSlot);
+        }
+
+        return scheduleData; // Will be empty list if no schedules found
     }
 }

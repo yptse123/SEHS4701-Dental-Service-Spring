@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface AppointmentService {
@@ -218,4 +219,13 @@ public interface AppointmentService {
          * @return List of available time slots as Object arrays [startTime, endTime]
          */
         List<Object[]> findAvailableTimeSlots(Clinic clinic, LocalDate date);
+
+        /**
+         * Get dentist schedule for a specific date
+         * 
+         * @param dentist the dentist
+         * @param date    the date
+         * @return list of schedule data as maps
+         */
+        List<Map<String, String>> getDentistScheduleForDate(Dentist dentist, LocalDate date);
 }

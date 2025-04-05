@@ -2,6 +2,9 @@ package com.example.webapp.controller.patient;
 
 import com.example.webapp.model.*;
 import com.example.webapp.service.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,6 +16,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -21,9 +27,9 @@ import org.slf4j.LoggerFactory;
 @Controller
 @RequestMapping("/patient")
 public class PatientAppointmentController {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(PatientAppointmentController.class);
-    
+
     private final PatientService patientService;
     private final AppointmentService appointmentService;
     private final DentistService dentistService;
@@ -131,7 +137,7 @@ public class PatientAppointmentController {
 
     // Show appointment booking form
     @GetMapping("/book")
-    public String showBookingForm(Model model ) {
+    public String showBookingForm(Model model) {
         model.addAttribute("appointment", new Appointment());
 
         // Get all active clinics for selection
@@ -157,9 +163,64 @@ public class PatientAppointmentController {
         List<Object[]> availableSlots = appointmentService.findAvailableTimeSlots(clinic, appointmentDate);
         model.addAttribute("availableSlots", availableSlots);
 
-        // Get available dentists for the clinic
-        List<Dentist> availableDentists = dentistService.findByClinic(clinic);
+        // For debugging
+        System.out.println("Selected date: " + appointmentDate + ", day of week: " + appointmentDate.getDayOfWeek());
+
+        // For debugging
+        System.out.println("Selected date: " + appointmentDate + ", day of week: " + appointmentDate.getDayOfWeek());
+
+        // Get dentists that work on the selected day at the selected clinic
+        List<Dentist> availableDentists = dentistService.findByClinicAndDayOfWeek(clinic,
+                appointmentDate.getDayOfWeek().toString());
+
+        if (availableDentists.isEmpty()) {
+            // No dentists work on this day at this clinic - get all dentists for the clinic
+            // as fallback
+            availableDentists = dentistService.findByClinic(clinic);
+        }
+
         model.addAttribute("dentists", availableDentists);
+
+        // Add dentist data
+        Map<Long, String> dentistSchedulesJson = new HashMap<>();
+        Map<Long, String> dentistAppointmentsJson = new HashMap<>();
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        for (Dentist dentist : availableDentists) {
+            try {
+                // For debugging
+                List<Map<String, String>> scheduleData = appointmentService.getDentistScheduleForDate(dentist,
+                        appointmentDate);
+                System.out.println("Dentist " + dentist.getId() + " schedule data: " + scheduleData);
+
+                // Always serialize as array
+                dentistSchedulesJson.put(dentist.getId(), objectMapper.writeValueAsString(scheduleData));
+
+                // Get appointments
+                List<Appointment> existingAppointments = appointmentService.findByDentistAndDate(dentist,
+                        appointmentDate);
+                List<Map<String, String>> appointmentData = new ArrayList<>();
+
+                for (Appointment apt : existingAppointments) {
+                    if (apt.getStatus() != Appointment.Status.CANCELLED) {
+                        Map<String, String> aptMap = new HashMap<>();
+                        aptMap.put("startTime", apt.getStartTime().toString());
+                        aptMap.put("endTime", apt.getEndTime().toString());
+                        appointmentData.add(aptMap);
+                    }
+                }
+
+                dentistAppointmentsJson.put(dentist.getId(), objectMapper.writeValueAsString(appointmentData));
+
+            } catch (Exception e) {
+                System.err.println("Error processing dentist " + dentist.getId() + ": " + e.getMessage());
+                dentistSchedulesJson.put(dentist.getId(), "[]");
+                dentistAppointmentsJson.put(dentist.getId(), "[]");
+            }
+        }
+
+        model.addAttribute("dentistSchedulesJson", dentistSchedulesJson);
+        model.addAttribute("dentistAppointmentsJson", dentistAppointmentsJson);
 
         // Keep clinics list for changing selection
         List<Clinic> clinics = clinicService.findAllActive();
@@ -257,11 +318,11 @@ public class PatientAppointmentController {
                 logger.error("Failed to send confirmation email: {}", emailEx.getMessage());
                 // Don't stop the process if email fails - just log the error
             }
-            
+
             // Set success message
-            redirectAttributes.addFlashAttribute("successMessage", 
-                "Your appointment has been booked successfully! A confirmation email has been sent to your email address.");
-            
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Your appointment has been booked successfully! A confirmation email has been sent to your email address.");
+
             return "redirect:/patient/appointments";
         } catch (Exception e) {
             // Log the exception for debugging

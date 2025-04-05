@@ -248,11 +248,14 @@
                                     <c:when test="${not empty dentists}">
                                         <div class="dentist-selection">
                                             <c:forEach items="${dentists}" var="dentist">
-                                                <div class="dentist-option">
+                                                <div class="dentist-option" 
+                                                    data-schedule='${dentistSchedulesJson[dentist.id]}' 
+                                                    data-appointments='${dentistAppointmentsJson[dentist.id]}'>
                                                     <input type="radio" name="dentistId" id="dentist${dentist.id}" 
-                                                           value="${dentist.id}" required>
+                                                        value="${dentist.id}" required>
                                                     <label for="dentist${dentist.id}">
                                                         <div class="dentist-name">Dr. ${dentist.firstName} ${dentist.lastName}</div>
+                                                        <div class="dentist-specialty">${dentist.specialization}</div>
                                                     </label>
                                                 </div>
                                             </c:forEach>

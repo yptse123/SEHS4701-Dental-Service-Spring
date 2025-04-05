@@ -3,8 +3,10 @@ package com.example.webapp.service;
 import com.example.webapp.model.Clinic;
 import com.example.webapp.model.Dentist;
 import com.example.webapp.model.DentistClinicAssignment;
+import com.example.webapp.model.Schedule;
 import com.example.webapp.model.User;
 import com.example.webapp.repository.DentistRepository;
+import com.example.webapp.repository.ScheduleRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -21,13 +23,14 @@ import java.util.stream.Collectors;
 
 @Service
 public class DentistServiceImpl implements DentistService {
-
     private final DentistRepository dentistRepository;
     private final ClinicService clinicService;
+    private final ScheduleRepository scheduleRepository;
 
-    public DentistServiceImpl(DentistRepository dentistRepository, ClinicService clinicService) {
+    public DentistServiceImpl(DentistRepository dentistRepository, ClinicService clinicService, ScheduleRepository scheduleRepository) {
         this.dentistRepository = dentistRepository;
         this.clinicService = clinicService;
+        this.scheduleRepository = scheduleRepository;
     }
 
     @Override
@@ -278,5 +281,15 @@ public class DentistServiceImpl implements DentistService {
     @Override
     public long countAllActive() {
         return dentistRepository.countByActiveTrue();
+    }
+
+    @Override
+    public List<Dentist> findByClinicAndDayOfWeek(Clinic clinic, String dayOfWeek) {
+        // Join dentists with schedules table to find those who work on the specific day
+        return scheduleRepository.findByClinicIdAndDayOfWeek(clinic.getId(), dayOfWeek)
+                .stream()
+                .map(Schedule::getDentist)
+                .distinct()
+                .collect(Collectors.toList());
     }
 }
