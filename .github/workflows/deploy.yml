@@ -47,7 +47,7 @@ jobs:
             cd /home/ubuntu/app
 
             # Stop and remove existing containers
-            docker-compose down || true
+            docker-compose down -v || true
 
             # Build and start the services
             docker-compose up -d --build
