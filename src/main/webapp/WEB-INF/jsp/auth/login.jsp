@@ -24,6 +24,10 @@ uri="http://java.sun.com/jsp/jstl/core" %>
     />
   </head>
   <body>
+    <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+    <sec:authorize access="isAuthenticated()">
+      <% response.sendRedirect(request.getContextPath() + "/dashboard"); %>
+    </sec:authorize>
     <div class="d-flex flex-column" style="min-height: 100vh">
       <!-- Navigation -->
       <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">

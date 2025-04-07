@@ -14,6 +14,10 @@
     <link rel="stylesheet" href="<c:url value='/static/css/register.css'/>">
 </head>
 <body>
+    <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+    <sec:authorize access="isAuthenticated()">
+      <% response.sendRedirect(request.getContextPath() + "/dashboard"); %>
+    </sec:authorize>
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
       <div class="container">
