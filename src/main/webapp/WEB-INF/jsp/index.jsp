@@ -537,16 +537,9 @@ uri="http://java.sun.com/jsp/jstl/core"%>
 
     <!-- Map Section -->
     <div class="container-fluid p-0">
-      <div class="map-container">
-        <iframe
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d59073.44023932723!2d114.14986544863281!3d22.28496!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3403e2eda332980f%3A0xf08ab3badbeac97c!2sHong%20Kong!5e0!3m2!1sen!2s!4v1648279915217!5m2!1sen!2s"
-          width="100%"
-          height="400"
-          style="border: 0"
-          allowfullscreen=""
-          loading="lazy"
-        ></iframe>
-      </div>
+        <div class="map-container">
+            <div id="clinicMap" style="width:100%; height:400px;"></div>
+        </div>
     </div>
 
     <!-- Footer -->
@@ -656,6 +649,136 @@ uri="http://java.sun.com/jsp/jstl/core"%>
           });
         });
       });
+
+      // Initialize the map
+      function initMap() {
+        // Center on Hong Kong
+        const hongKong = { lat: 22.3193, lng: 114.1694 };
+        
+        // Create the map
+        const map = new google.maps.Map(document.getElementById("clinicMap"), {
+            zoom: 12,
+            center: hongKong,
+            mapTypeControl: true,
+            streetViewControl: true,
+            fullscreenControl: true
+        });
+        
+        // Define clinic locations
+        const clinics = [
+            {
+                name: "Central Dental Clinic",
+                position: { lat: 22.2828, lng: 114.1548 },
+                address: "123 Dental Street, Central, Hong Kong",
+                phone: "+852 1234 5678"
+            },
+            {
+                name: "Tsim Sha Tsui Clinic",
+                position: { lat: 22.2988, lng: 114.1722 },
+                address: "45 Nathan Road, Tsim Sha Tsui, Kowloon",
+                phone: "+852 2345 6789"
+            },
+            {
+                name: "Causeway Bay Clinic",
+                position: { lat: 22.2808, lng: 114.1837 },
+                address: "67 Yee Wo Street, Causeway Bay, Hong Kong",
+                phone: "+852 3456 7890"
+            },
+            {
+                name: "Mong Kok Clinic",
+                position: { lat: 22.3203, lng: 114.1694 },
+                address: "88 Argyle Street, Mong Kok, Kowloon",
+                phone: "+852 4567 8901"
+            },
+            {
+                name: "Sha Tin Clinic",
+                position: { lat: 22.3833, lng: 114.1890 },
+                address: "123 Sha Tin Centre, New Territories",
+                phone: "+852 5678 9012"
+            }
+        ];
+        
+        // Create an info window to share between markers
+        const infoWindow = new google.maps.InfoWindow();
+        
+        // Create the markers
+        clinics.forEach((clinic) => {
+            const marker = new google.maps.Marker({
+                position: clinic.position,
+                map: map,
+                title: clinic.name,
+                animation: google.maps.Animation.DROP
+            });
+            
+            // Create info window content - using concatenation instead of template literals
+            const content = 
+                '<div class="clinic-info" style="padding: 10px; max-width: 300px;">' +
+                    '<h5 style="margin-top: 0; margin-bottom: 10px; color: #0d6efd;">' + clinic.name + '</h5>' +
+                    '<p style="margin-bottom: 5px;"><i class="fas fa-map-marker-alt" style="color: #dc3545;"></i> ' + 
+                        clinic.address + '</p>' +
+                    '<p style="margin-bottom: 10px;"><i class="fas fa-phone" style="color: #0d6efd;"></i> ' + 
+                        clinic.phone + '</p>' +
+                    '<a href="/patient/book" class="btn btn-sm btn-primary" style="background-color: #0d6efd; ' +
+                        'color: white; text-decoration: none; padding: 5px 10px; border-radius: 4px;">Book Appointment</a>' +
+                '</div>';
+            
+            // Add click event to show info window
+            marker.addListener("click", () => {
+                // Close any open info window first
+                infoWindow.close();
+                // Set content and open
+                infoWindow.setContent(content);
+                infoWindow.open({
+                    anchor: marker,
+                    map,
+                    shouldFocus: false,
+                });
+                
+                // Bounce the marker
+                if (marker.getAnimation() !== null) {
+                    marker.setAnimation(null);
+                } else {
+                    marker.setAnimation(google.maps.Animation.BOUNCE);
+                    setTimeout(() => {
+                        marker.setAnimation(null);
+                    }, 750);
+                }
+            });
+            
+            // Also open first clinic's info window by default
+            if (clinic === clinics[0]) {
+                google.maps.event.addListenerOnce(map, 'idle', function() {
+                    infoWindow.setContent(content);
+                    infoWindow.open(map, marker);
+                });
+            }
+        });
+        
+        // Add some additional styling
+        const styles = `
+            .clinic-info h5 {
+                font-weight: bold;
+                color: #0d6efd;
+            }
+            .clinic-info p {
+                margin-bottom: 8px;
+            }
+            .clinic-info .btn {
+                display: inline-block;
+                font-weight: 500;
+                text-align: center;
+            }
+        `;
+        
+        const styleSheet = document.createElement("style");
+        styleSheet.type = "text/css";
+        styleSheet.innerText = styles;
+        document.head.appendChild(styleSheet);
+    }
+    </script>
+    <!-- Load Google Maps JavaScript API with your API key -->
+    <script async defer
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDewRVkvQ9vrv1Ky80wl5N1IAmH0xUZ_7U&callback=initMap">
     </script>
   </body>
 </html>
