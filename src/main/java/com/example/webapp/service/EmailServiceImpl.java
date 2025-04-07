@@ -30,7 +30,7 @@ public class EmailServiceImpl implements EmailService {
     @Value("${app.name:Hong Kong Dental Clinic}")
     private String appName;
 
-    @Value("${app.base-url:https://hkdental.me/}")
+    @Value("${app.base-url:https://hkdental.me}")
     private String baseUrl;
 
     private final JavaMailSender emailSender;
