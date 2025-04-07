@@ -216,7 +216,7 @@ uri="http://java.sun.com/jsp/jstl/core" %>
                   <i class="fas fa-phone-alt me-2"></i> +852 1234 5678
                 </li>
                 <li class="mb-2">
-                  <i class="fas fa-envelope me-2"></i> info@hkdentalclinic.com
+                  <i class="fas fa-envelope me-2"></i> info@hkdental.me
                 </li>
                 <li>
                   <i class="fas fa-clock me-2"></i> Mon-Fri: 9:00-18:00, Sat:
