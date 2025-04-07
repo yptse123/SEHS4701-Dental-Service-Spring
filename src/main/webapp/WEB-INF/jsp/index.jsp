@@ -443,41 +443,42 @@ uri="http://java.sun.com/jsp/jstl/core"%>
             <div class="card border-0 shadow-sm h-100">
               <div class="card-body p-4">
                 <h4 class="mb-4">Send Us a Message</h4>
-                <form>
-                  <div class="mb-3">
-                    <label for="name" class="form-label">Your Name</label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      id="name"
-                      required
-                    />
-                  </div>
-                  <div class="mb-3">
-                    <label for="email" class="form-label">Email Address</label>
-                    <input
-                      type="email"
-                      class="form-control"
-                      id="email"
-                      required
-                    />
-                  </div>
-                  <div class="mb-3">
-                    <label for="phone" class="form-label">Phone Number</label>
-                    <input type="tel" class="form-control" id="phone" />
-                  </div>
-                  <div class="mb-3">
-                    <label for="message" class="form-label">Message</label>
-                    <textarea
-                      class="form-control"
-                      id="message"
-                      rows="4"
-                      required
-                    ></textarea>
-                  </div>
-                  <button type="submit" class="btn btn-primary">
-                    Send Message
-                  </button>
+
+                <c:if test="${param.success eq 'true'}">
+                    <div class="alert alert-success alert-dismissible fade show mb-4">
+                        <i class="fas fa-check-circle me-2"></i> Thank you for your message! We will get back to you shortly.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </c:if>
+
+                <c:if test="${param.error eq 'true'}">
+                    <div class="alert alert-danger alert-dismissible fade show mb-4">
+                        <i class="fas fa-exclamation-circle me-2"></i> Sorry, there was a problem sending your message. Please try again.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </c:if>
+
+                <form action="<c:url value='/contact/send'/>" method="post">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Your Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="email" name="email" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control" id="phone" name="phone" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Message</label>
+                        <textarea class="form-control" id="message" name="message" rows="4" required></textarea>
+                    </div>
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane me-2"></i> Send Message
+                    </button>
                 </form>
               </div>
             </div>
@@ -648,6 +649,28 @@ uri="http://java.sun.com/jsp/jstl/core"%>
             behavior: "smooth",
           });
         });
+      });
+
+      document.addEventListener('DOMContentLoaded', function() {
+          // Check for contact form submission feedback
+          const urlParams = new URLSearchParams(window.location.search);
+          if (urlParams.has('success') || urlParams.has('error')) {
+              // Scroll to contact section smoothly
+              setTimeout(function() {
+                  document.getElementById('contact').scrollIntoView({
+                      behavior: 'smooth'
+                  });
+              }, 300);
+          }
+          
+          // Auto-hide alerts after 5 seconds
+          setTimeout(function() {
+              const alerts = document.querySelectorAll('.alert');
+              alerts.forEach(alert => {
+                  const bsAlert = new bootstrap.Alert(alert);
+                  bsAlert.close();
+              });
+          }, 5000);
       });
 
       // Initialize the map

@@ -49,7 +49,7 @@ public class SecurityConfig {
                                 .securityMatcher(notForwarded)
                                 .authorizeHttpRequests(authorize -> authorize
                                                 .requestMatchers("/", "/index", "/home", "/about", "/services",
-                                                                "/contact", "/register", "/login")
+                                                                "/contact", "/register", "/login", "/contact/send")
                                                 .permitAll()
                                                 .requestMatchers("/images/**", "/css/**", "/js/**", "/static/**",
                                                                 "/testpage", "/test", "/error/**")
