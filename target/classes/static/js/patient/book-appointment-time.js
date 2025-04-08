@@ -108,15 +108,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Add event listeners to time slot inputs
     timeSlotInputs.forEach(input => {
-        input.addEventListener('change', function() {
+        input.addEventListener('change', function () {
             if (this.checked) {
                 const startTime = this.dataset.start;
                 const endTime = this.dataset.end;
-                
+
                 // Update hidden fields
                 document.querySelector('input[name="startTime"]').value = startTime;
                 document.querySelector('input[name="endTime"]').value = endTime;
-                
+
                 // Filter dentists based on selected time slot but keep all visible
                 filterDentistsByTimeSlot(startTime, endTime);
             }
@@ -129,13 +129,35 @@ document.addEventListener('DOMContentLoaded', function () {
         const appointmentDate = document.querySelector('input[name="appointmentDate"]').value;
         const dayOfWeek = getDayOfWeek(appointmentDate);
 
+        console.log(`Filtering dentists for clinic ID: ${clinicId}, day: ${dayOfWeek}`);
+
         // Show loading state
         setDentistSectionLoading(true);
 
+        // Debug - list all dentists and their clinic IDs
+        dentistData.forEach(dentist => {
+            const clinicIds = dentist.scheduleData.map(s => s.clinicId);
+            console.log(`Dentist ID: ${dentist.id}, Works at clinics: ${clinicIds.join(', ')}`);
+        });
+
         // Check each dentist
         dentistData.forEach(dentist => {
-            const isAvailable = dentistWorksAtClinicOnDay(dentist, clinicId, dayOfWeek);
-            toggleDentistVisibility(dentist, isAvailable);
+            // First verify this dentist is ONLY shown for the selected clinic
+            const belongsToClinic = dentist.scheduleData.some(schedule =>
+                parseInt(schedule.clinicId) === parseInt(clinicId)
+            );
+
+            if (!belongsToClinic) {
+                // Not from this clinic at all - always hide
+                toggleDentistVisibility(dentist, false);
+                return;
+            }
+
+            // Dentist belongs to this clinic, now check if they work on this day
+            const worksOnThisDay = dentistWorksAtClinicOnDay(dentist, clinicId, dayOfWeek);
+
+            // Only show dentists who have schedules for this day at this clinic
+            toggleDentistVisibility(dentist, worksOnThisDay);
         });
 
         // Update UI state
@@ -155,25 +177,24 @@ document.addEventListener('DOMContentLoaded', function () {
         // Deselect all dentists first
         deselectAllDentists();
 
-        // Check each dentist - SHOW ALL who work that day but disable those not available at the time
         dentistData.forEach(dentist => {
             // First check if dentist works on this day at this clinic
             const worksOnDay = dentistWorksAtClinicOnDay(dentist, clinicId, dayOfWeek);
 
             if (worksOnDay) {
-                // Dentist works today, now check if available at the specific time
+                // This dentist has hours on this day, now check if available at the specific time
                 const worksOnTime = dentistWorksAtTime(dentist, clinicId, startTime, endTime);
                 const isBooked = hasDentistBookingConflict(dentist, appointmentDate, startTime, endTime);
 
-                // Show the dentist but disable if not available at this specific time
-                toggleDentistVisibility(dentist, true); // Always show
+                // Always show this dentist (we know they work today)
+                toggleDentistVisibility(dentist, true);
 
                 if (!worksOnTime || isBooked) {
-                    // Make it disabled but visible and add reason
+                    // Not available at this time - gray it out
                     dentist.element.classList.add('disabled');
                     dentist.element.querySelector('input').disabled = true;
 
-                    // Add reason why unavailable
+                    // Add reason
                     const reasonEl = dentist.element.querySelector('.unavailable-reason') ||
                         createUnavailableReasonElement();
 
@@ -183,9 +204,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         reasonEl.textContent = "Already booked";
                     }
 
-                    dentist.element.appendChild(reasonEl);
+                    if (!dentist.element.querySelector('.unavailable-reason')) {
+                        dentist.element.appendChild(reasonEl);
+                    }
                 } else {
-                    // Available at this time
+                    // Available at this time - make active
                     dentist.element.classList.remove('disabled');
                     dentist.element.querySelector('input').disabled = false;
 
@@ -194,12 +217,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (reasonEl) reasonEl.remove();
                 }
             } else {
-                // Doesn't work today at all - hide completely
+                // Hide dentists who don't work today at all
                 toggleDentistVisibility(dentist, false);
             }
         });
 
-        // Update UI state - but don't hide all dentists
+        // Update UI without hiding visible dentists
         updateDentistSelectionUIWithoutHiding();
         setDentistSectionLoading(false);
     }
@@ -265,17 +288,38 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Check if dentist works at the clinic on a specific day
     function dentistWorksAtClinicOnDay(dentist, clinicId, dayOfWeek) {
-        // If no schedule data, assume the dentist is available
-        // (since they're in the UI, they must work at this clinic)
+        // If no schedule data, the dentist should NOT be assumed available
         if (!dentist.scheduleData || !Array.isArray(dentist.scheduleData) || dentist.scheduleData.length === 0) {
-            console.log(`No schedule data for dentist ${dentist.id} - assuming available`);
-            return true;
+            console.log(`No schedule data for dentist ${dentist.id} - assuming NOT available`);
+            return false; // Changed from true to false
         }
 
         // Check if dentist has a schedule entry for this clinic and day
         return dentist.scheduleData.some(schedule => {
-            return schedule && schedule.clinicId == clinicId && schedule.dayOfWeek === dayOfWeek;
+            // Use strict comparison for clinic ID and convert if needed
+            return schedule &&
+                parseInt(schedule.clinicId) === parseInt(clinicId) &&
+                schedule.dayOfWeek === dayOfWeek;
         });
+    }
+
+    // Add this function to verify dentist-clinic assignments
+    function isDentistAssignedToClinic(dentist, clinicId) {
+        // First check if we have specific assignment data
+        if (dentist.clinicAssignments && Array.isArray(dentist.clinicAssignments)) {
+            return dentist.clinicAssignments.some(assignment =>
+                parseInt(assignment.clinicId) === parseInt(clinicId)
+            );
+        }
+
+        // Fallback: Check if any schedule exists for this clinic
+        if (dentist.scheduleData && Array.isArray(dentist.scheduleData)) {
+            return dentist.scheduleData.some(schedule =>
+                parseInt(schedule.clinicId) === parseInt(clinicId)
+            );
+        }
+
+        return false;
     }
 
     // Check if dentist works at the specified time
@@ -330,11 +374,13 @@ document.addEventListener('DOMContentLoaded', function () {
     // Toggle visibility of dentist option
     function toggleDentistVisibility(dentist, isVisible) {
         if (isVisible) {
+            // Make visible
+            dentist.element.style.display = 'block';
             dentist.element.classList.remove('disabled');
             dentist.element.querySelector('input').disabled = false;
         } else {
-            dentist.element.classList.add('disabled');
-            dentist.element.querySelector('input').disabled = true;
+            // Completely hide (not just disable)
+            dentist.element.style.display = 'none';
             dentist.element.querySelector('input').checked = false;
         }
     }
