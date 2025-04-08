@@ -8,6 +8,7 @@ import java.util.List;
 
 @Repository
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
+    List<Schedule> findByDentistId(Long dentistId);
     
     /**
      * Find schedules by dentist ID and day of week

@@ -198,16 +198,126 @@
                     </div>
                 </div>
                 
-                <!-- Schedule section - could be expanded in future -->
+                <!-- Schedule section -->
                 <div class="detail-card mt-4">
-                    <div class="card-header">
+                    <div class="card-header d-flex justify-content-between align-items-center">
                         <h3>Schedule</h3>
+                        <button type="button" class="btn btn-sm btn-primary" id="addScheduleBtn">
+                            <i class="fas fa-plus"></i> Add Schedule
+                        </button>
                     </div>
-                    <div class="schedule-placeholder">
-                        <p class="text-muted text-center p-4">
-                            <i class="fas fa-calendar-alt fa-2x mb-3"></i><br>
-                            Schedule management will be available soon
-                        </p>
+                    
+                    <div class="table-responsive">
+                        <table class="data-table" id="scheduleTable">
+                            <thead>
+                                <tr>
+                                    <th>Clinic</th>
+                                    <th>Day of Week</th>
+                                    <th>Start Time</th>
+                                    <th>End Time</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <c:choose>
+                                    <c:when test="${not empty dentistSchedules}">
+                                        <c:forEach var="schedule" items="${dentistSchedules}">
+                                            <tr data-schedule-id="${schedule.id}">
+                                                <td>${schedule.clinic.name}</td>
+                                                <td>${schedule.dayOfWeek}</td>
+                                                <td>${schedule.startTime}</td>
+                                                <td>${schedule.endTime}</td>
+                                                <td>
+                                                    <div class="actions">
+                                                        <button class="btn btn-sm btn-outline-primary edit-schedule-btn" 
+                                                                data-schedule-id="${schedule.id}"
+                                                                data-clinic-id="${schedule.clinic.id}"
+                                                                data-day="${schedule.dayOfWeek}"
+                                                                data-start="${schedule.startTime}"
+                                                                data-end="${schedule.endTime}">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-danger delete-schedule-btn" 
+                                                                data-schedule-id="${schedule.id}">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </c:forEach>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <tr id="no-schedules-row">
+                                            <td colspan="5" class="no-results">
+                                                <i class="fas fa-calendar-times"></i>
+                                                No schedules found for this dentist
+                                            </td>
+                                        </tr>
+                                    </c:otherwise>
+                                </c:choose>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Schedule Modal -->
+                <div class="modal" id="scheduleModal">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 id="scheduleModalTitle">Add Schedule</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="scheduleForm">
+                                    <input type="hidden" id="scheduleId" name="scheduleId">
+                                    <input type="hidden" name="dentistId" value="${dentist.id}">
+                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                    
+                                    <div class="form-group">
+                                        <label for="clinicId">Clinic</label>
+                                        <select name="clinicId" id="clinicId" class="form-control" required>
+                                            <option value="">-- Select Clinic --</option>
+                                            <c:forEach var="assignment" items="${dentist.clinicAssignments}">
+                                                <option value="${assignment.clinic.id}">${assignment.clinic.name}</option>
+                                            </c:forEach>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="dayOfWeek">Day of Week</label>
+                                        <select name="dayOfWeek" id="dayOfWeek" class="form-control" required>
+                                            <option value="MONDAY">Monday</option>
+                                            <option value="TUESDAY">Tuesday</option>
+                                            <option value="WEDNESDAY">Wednesday</option>
+                                            <option value="THURSDAY">Thursday</option>
+                                            <option value="FRIDAY">Friday</option>
+                                            <option value="SATURDAY">Saturday</option>
+                                            <option value="SUNDAY">Sunday</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label for="startTime">Start Time</label>
+                                            <input type="time" name="startTime" id="startTime" class="form-control" required>
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label for="endTime">End Time</label>
+                                            <input type="time" name="endTime" id="endTime" class="form-control" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div id="scheduleValidationMsg" class="text-danger mt-2 d-none"></div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                <button type="button" id="saveScheduleBtn" class="btn btn-primary">Save</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

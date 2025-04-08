@@ -2,7 +2,9 @@ package com.example.webapp.controller;
 
 import com.example.webapp.model.Clinic;
 import com.example.webapp.model.Dentist;
+import com.example.webapp.model.Schedule;
 import com.example.webapp.model.User;
+import com.example.webapp.repository.ScheduleRepository;
 import com.example.webapp.service.DentistService;
 import com.example.webapp.service.UserService;
 import com.example.webapp.service.ClinicService;
@@ -32,11 +34,16 @@ public class AdminDentistController {
     private final DentistService dentistService;
     private final UserService userService;
     private final ClinicService clinicService;
+    private final ScheduleRepository scheduleRepository;
 
-    public AdminDentistController(DentistService dentistService, UserService userService, ClinicService clinicService) {
+    public AdminDentistController(DentistService dentistService,
+            UserService userService,
+            ClinicService clinicService,
+            ScheduleRepository scheduleRepository) {
         this.dentistService = dentistService;
         this.userService = userService;
         this.clinicService = clinicService;
+        this.scheduleRepository = scheduleRepository;
     }
 
     @GetMapping
@@ -202,6 +209,10 @@ public class AdminDentistController {
             model.addAttribute("dentist", dentist);
             model.addAttribute("clinics", clinicService.findAll());
             model.addAttribute("availableClinics", clinicService.findAllActive());
+
+            // Load dentist schedules
+            List<Schedule> dentistSchedules = scheduleRepository.findByDentistId(id);
+            model.addAttribute("dentistSchedules", dentistSchedules);
 
             return "admin/dentist-details";
         } else {
