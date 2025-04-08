@@ -226,7 +226,7 @@
                 </div>
                 
                 <!-- Medical Records Card -->
-                <div class="detail-card mt-4">
+                <!-- <div class="detail-card mt-4">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h3>Medical Records</h3>
                         <a href="<c:url value='/admin/medical-records/new?patientId=${patient.id}'/>" class="btn btn-sm btn-primary">
@@ -240,7 +240,7 @@
                             Medical records management will be available soon
                         </p>
                     </div>
-                </div>
+                </div> -->
             </div>
         </main>
     </div>
