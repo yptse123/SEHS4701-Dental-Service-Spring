@@ -256,6 +256,10 @@
                                                     <label for="dentist${dentist.id}">
                                                         <div class="dentist-name">Dr. ${dentist.firstName} ${dentist.lastName}</div>
                                                         <div class="dentist-specialty">${dentist.specialization}</div>
+                                                        <div class="dentist-schedule">
+                                                            <i class="fas fa-calendar-alt"></i>
+                                                            <span class="schedule-time">Loading schedule...</span>
+                                                        </div>
                                                     </label>
                                                 </div>
                                             </c:forEach>
