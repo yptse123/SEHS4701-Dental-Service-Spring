@@ -93,7 +93,7 @@
                                     <input type="text" name="appointmentDate" id="appointmentDate" class="form-control" placeholder="Click to select a date" required readonly>
                                     <i class="fas fa-calendar-alt date-icon"></i>
                                 </div>
-                                <small class="form-text text-muted">Select a date for your appointment. You can only book appointments up to 30 days in advance.</small>
+                                <small class="form-text text-muted">Select a date for your appointment. You can only book appointments up to 3 months in advance.</small>
                             </div>
 
                             <div class="form-actions">
