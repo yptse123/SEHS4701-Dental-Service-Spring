@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize date picker
     const today = new Date();
     const maxDate = new Date();
-    maxDate.setDate(today.getDate() + 30); // Allow booking 30 days in advance
+    maxDate.setDate(today.getDate() + 90); // Allow booking 30 days in advance
     
     flatpickr("#appointmentDate", {
         minDate: "today",
